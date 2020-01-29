@@ -5,7 +5,7 @@
 
 Cross-platform client for Catapult.
 
-[Download NEM2 Desktop Wallet](https://github.com/nemfoundation/nem2-desktop-wallet/branches) for Mac, Linux, or Windows.
+[Download NEM2 Desktop Wallet](https://github.com/nemfoundation/nem2-desktop-wallet/releases) for Mac, Linux, or Windows.
 
 :warning: **This program is currently in development and only available for the Catapult test network. Do not use it for other purposes.**
 ## Requirements

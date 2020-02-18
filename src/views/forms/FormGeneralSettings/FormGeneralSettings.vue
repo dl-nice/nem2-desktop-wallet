@@ -27,10 +27,10 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="label">
+        <div class="label wallet-selector-label">
           <FormLabel>{{ $t('form_label_default_wallet') }}</FormLabel>
         </div>
-        <div class="value">
+        <div class="value wallet-selector-value">
           <WalletSelectorField v-model="formItems.defaultWallet" :auto-submit="false" :default-form-style="true" />
         </div>
       </div>
@@ -46,32 +46,37 @@ export default class FormGeneralSettings extends FormGeneralSettingsTs {}
 <style lang="less" scoped>
 @import "../../../views/resources/css/variables.less";
 .general-settings-container {
-    display: block;
+  display: block;
+  width: 100%;
+  clear: both;
+  min-height: 1rem;
+  .form-row {
     width: 100%;
-    clear: both;
-    min-height: 1rem;
-    .form-row {
-        width: 100%;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        display: flex;
-    }
-    .label {
-        display: inline-block;
-        text-align: right;
-        font-size: 20px;
-        width: 100%;
-        margin-right: 25px;
-        margin-top:4px;
-    }
-    .label-fee {
-        margin-top:27px;
-    }
-    .value {
-        float: left;
-        font-size: @smallerFont;
-        font-weight: bolder;
-    }
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+  }
+  .label {
+    display: inline-block;
+    text-align: right;
+    font-size: @normalFont;
+    width: 100%;
+    margin-right: 25px;
+  }
+  .label-fee {
+    margin-top:26px;
+  }
+  .wallet-selector-label {
+    margin-top:22px;
+  }
+  .value {
+    float: left;
+    font-size: @smallerFont;
+    font-weight: bolder;
+  }
+  .wallet-selector-value {
+    margin-top: 20px;
+  }
 }
 </style>
 

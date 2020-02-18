@@ -31,10 +31,11 @@
       <div class="xym-outline wallet-info-tile">
         <div class="title">
           <span class="title_txt">
-            {{ $t('nodeUrl') }}:&nbsp;
-            <span class="title_txt">
+            {{ $t('nodeUrl') }}
+            <!-- <span class="title_txt">
               {{ currentPeerInfo ? currentPeerInfo.friendlyName : $t('loading') }}
-            </span></span>
+            </span> -->
+            </span>
         </div>
         <img src="@/views/resources/img/monitor/amount.png">
         <span class="txt_info">

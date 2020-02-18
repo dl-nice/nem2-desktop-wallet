@@ -14,7 +14,7 @@
             class="transaction-tab-inner-container"
             @input="currentTab = 'confirmed'"
           >
-            <PageTitle :title="$t('transactions')" @refresh="refresh('confirmed')" />
+            <!-- <PageTitle :title="$t('transactions')" @refresh="refresh('confirmed')" /> -->
 
             <!-- Confirmed transactions tab -->
             <TransactionTable :transactions="currentPageTransactions.items" @click="onClickTransaction" />

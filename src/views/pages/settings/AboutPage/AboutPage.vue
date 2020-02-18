@@ -13,7 +13,7 @@
           <a :href="configs.package.homepage" target="_blank">{{ configs.package.homepage }}</a>
         </div>
       </div>
-      <div class="form-row"></div>
+      <div class="form-row" />
 
       <div class="subtitle">{{ $t('about_network') }}</div>
 

@@ -1,7 +1,6 @@
 <template>
   <div :class="className">
     <div class="fee flex_center">
-      <FormLabel>{{ $t('fee') }}</FormLabel>
       <div class="inline-container">
         <div class="full-width-item-container">
           <span class="type value radius flex_center">

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <FormLabel>{{ $t('set_explorer_link') }}</FormLabel>
     <div class="inline-container">
       <ValidationProvider
         v-slot="{ errors }"

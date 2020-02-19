@@ -1,6 +1,7 @@
 <template>
   <div class="about-container text_select">
     <div class="form-container">
+        <div class="subtitle">{{ $t('about_version') }}</div>
       <div class="form-row">
         <div class="label">
           <FormLabel>{{ $t('about_app_release') }}</FormLabel>
@@ -130,6 +131,7 @@ export default class AboutPage extends Vue {
   width: 100%;
   clear: both;
   min-height: 1rem;
+  margin-left: 45px;
   .form-row {
     width: 100%;
     margin-top: 20px;
@@ -137,37 +139,19 @@ export default class AboutPage extends Vue {
 
     .label {
       float: left;
-      font-size: 20px;
       width: 250px;
+      font-size: @normalFont;
+      margin-left: 25px;
     }
 
     .value {
       float: left;
-      margin-left: 50px;
-      font-size: 20px;
+      font-size: @smallerFont;
       font-weight: bolder;
     }
   }
-  // .form-row {
-  //   width: 100%;
-  //   margin-top: 20px;
-  //   margin-bottom: 20px;
-  //   display: flex;
-  // }
-  // .label {
-  //   display: inline-block;
-  //   text-align: right;
-  //   font-size: @normalFont;
-  //   width: 100%;
-  //   margin-right: 25px;
-  // }
-  // .value {
-  //   float: left;
-  //   font-size: @smallerFont;
-  //   font-weight: bolder;
-  // }
   .subtitle {
-    font-size: 25px;
+    font-size: @biggerFont;
     margin-top: 50px;
   }
 }

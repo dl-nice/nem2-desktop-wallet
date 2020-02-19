@@ -1,7 +1,7 @@
 <template>
   <div>
     <FormWrapper class="general-settings-container">
-      <div class="form-row">
+      <div class="form-row first-row">
         <div class="label">
           <FormLabel>{{ $t('form_label_language') }}</FormLabel>
         </div>
@@ -11,21 +11,12 @@
       </div>
       <!-- Transaction fee selector -->
       <div class="form-row">
-        <div class="label label-fee">
-          <FormLabel>{{ $t('form_label_fee') }}</FormLabel>
-        </div>
-        <div class="value">
-          <MaxFeeSelector v-model="formItems.maxFee" />
-        </div>
+        <MaxFeeSelector v-model="formItems.maxFee" />
       </div>
       <div class="form-row">
-        <div class="label">
-          <FormLabel>{{ $t('set_explorer_link') }}</FormLabel>
-        </div>
-        <div class="value">
-          <ExplorerUrlSetter v-model="formItems.explorerUrl" :auto-submit="false" />
-        </div>
+        <ExplorerUrlSetter v-model="formItems.explorerUrl" :auto-submit="false" />
       </div>
+
       <div class="form-row">
         <div class="label wallet-selector-label">
           <FormLabel>{{ $t('form_label_default_wallet') }}</FormLabel>
@@ -46,15 +37,18 @@ export default class FormGeneralSettings extends FormGeneralSettingsTs {}
 <style lang="less" scoped>
 @import "../../../views/resources/css/variables.less";
 .general-settings-container {
-  display: block;
+  display: inline-block;
   width: 100%;
   clear: both;
   min-height: 1rem;
   .form-row {
     width: 100%;
-    margin-top: 20px;
+    margin-top: 15px;
     margin-bottom: 20px;
     display: flex;
+  }
+  .first-row {
+    margin-top: 14px;
   }
   .label {
     display: inline-block;
@@ -62,12 +56,6 @@ export default class FormGeneralSettings extends FormGeneralSettingsTs {}
     font-size: @normalFont;
     width: 100%;
     margin-right: 25px;
-  }
-  .label-fee {
-    margin-top:26px;
-  }
-  .wallet-selector-label {
-    margin-top:22px;
   }
   .value {
     float: left;
@@ -78,5 +66,6 @@ export default class FormGeneralSettings extends FormGeneralSettingsTs {}
     margin-top: 20px;
   }
 }
+
 </style>
 

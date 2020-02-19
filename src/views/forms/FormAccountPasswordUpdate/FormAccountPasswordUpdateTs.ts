@@ -72,6 +72,7 @@ export class FormAccountPasswordUpdateTs extends Vue {
    * @var {Object}
    */
   public formItems = {
+    oldPassword:'',
     password: '',
     passwordConfirm: '',
     passwordHint: '',

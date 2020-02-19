@@ -144,10 +144,8 @@ export default class FormAccountPasswordUpdate extends FormAccountPasswordUpdate
   display: block;
   width: 100%;
   clear: both;
-  min-height: 1rem;
   .form-row {
     width: 100%;
-    margin-bottom: 20px;
     display: flex;
   }
   .label {

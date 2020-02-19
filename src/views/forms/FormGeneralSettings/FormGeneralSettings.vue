@@ -10,9 +10,7 @@
         </div>
       </div>
       <!-- Transaction fee selector -->
-    
       <MaxFeeSelector v-model="formItems.maxFee" />
-    
       <ExplorerUrlSetter v-model="formItems.explorerUrl" :auto-submit="true" />
       <div class="form-row">
         <div class="label wallet-selector-label">

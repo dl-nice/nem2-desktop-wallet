@@ -983,7 +983,7 @@
     "form_label_add_cosignatory": "Add a cosignatory",
     "form_label_remove_cosignatory": "Remove a cosignatory",
     "form_label_cosignatory_modifications": "Cosignatory modifications",
-    "form_label_default_wallet": "Set Default wallet",
+    "form_label_default_wallet": "设置默认钱包",
     "form_label_description_min_approval": "从多签中添加某人或完成此多签交易所需的签名数",
     "form_label_description_min_removal": "Minimum signatures required to remove a cosigner",
     "form_label_fee": "Set Fee"

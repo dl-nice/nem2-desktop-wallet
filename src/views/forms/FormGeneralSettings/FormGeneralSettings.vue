@@ -1,7 +1,7 @@
 <template>
   <div>
     <FormWrapper class="general-settings-container">
-      <div class="form-row first-row">
+      <div class="form-row">
         <div class="label">
           <FormLabel>{{ $t('form_label_language') }}</FormLabel>
         </div>
@@ -10,13 +10,10 @@
         </div>
       </div>
       <!-- Transaction fee selector -->
-      <div class="form-row">
-        <MaxFeeSelector v-model="formItems.maxFee" />
-      </div>
-      <div class="form-row">
-        <ExplorerUrlSetter v-model="formItems.explorerUrl" :auto-submit="false" />
-      </div>
-
+    
+      <MaxFeeSelector v-model="formItems.maxFee" />
+    
+      <ExplorerUrlSetter v-model="formItems.explorerUrl" :auto-submit="true" />
       <div class="form-row">
         <div class="label wallet-selector-label">
           <FormLabel>{{ $t('form_label_default_wallet') }}</FormLabel>
@@ -44,11 +41,7 @@ export default class FormGeneralSettings extends FormGeneralSettingsTs {}
   .form-row {
     width: 100%;
     margin-top: 15px;
-    margin-bottom: 20px;
     display: flex;
-  }
-  .first-row {
-    margin-top: 14px;
   }
   .label {
     display: inline-block;
@@ -63,7 +56,10 @@ export default class FormGeneralSettings extends FormGeneralSettingsTs {}
     font-weight: bolder;
   }
   .wallet-selector-value {
-    margin-top: 20px;
+    margin-top: 10px;
+  }
+    .wallet-selector-label {
+    margin-top: 10px;
   }
 }
 

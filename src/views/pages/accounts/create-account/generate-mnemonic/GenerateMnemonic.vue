@@ -1,10 +1,9 @@
 <template>
   <div class="step-2-wrapper" @mouseover="shouldTrackMouse && handleMousemove($event)">
-    <img src="@/views/resources/img/back.png">
+    <ProgressDisplay :value="percent" />
     <div class="progress-bar">
       {{ $t('Move_your_mouse') }}
     </div>
-    <Progress :stroke-width="20" stroke-color="#1FB6AC" :percent="percent" />
   </div>
 </template>
 

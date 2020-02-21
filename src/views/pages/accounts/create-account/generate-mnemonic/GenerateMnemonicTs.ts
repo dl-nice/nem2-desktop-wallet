@@ -25,7 +25,13 @@ import {AESEncryptionService} from '@/services/AESEncryptionService'
 import {NotificationType} from '@/core/utils/NotificationType'
 import {AccountsRepository} from '@/repositories/AccountsRepository'
 
+// @ts-ignore
+import ProgressDisplay from '@/components/ProgressDisplay/ProgressDisplay.vue'
+
 @Component({
+  components: {
+    ProgressDisplay,
+  },
   computed: {...mapGetters({
     currentAccount: 'account/currentAccount',
     currentPassword: 'temporary/password'
@@ -68,7 +74,7 @@ export default class GenerateMnemonicTs extends Vue {
    * Percentage of entropy generation process
    * @var {number}
    */
-  private percent: number = 0
+  percent: number = 0
 
   /**
    * Hook called when the component is mounted

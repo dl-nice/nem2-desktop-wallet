@@ -1,6 +1,6 @@
 <template>
-  <div class="form-account-setting">
-    <FormWrapper>
+  <div>
+    <FormWrapper class="account-setting-container">
       <ValidationObserver v-slot="{ handleSubmit }">
         <form @keyup.enter="handleSubmit(submit)">
           <div class="fixed-full-width-item-container">
@@ -8,116 +8,118 @@
               {{ $t('Set_account_password') }}
             </div>
           </div>
-          <div class="form-row">
-            <div class="label">
-              <FormLabel>{{ $t('Set_account_name') }}</FormLabel>
+          <div class="left-container">
+            <div class="form-row">
+              <div class="label">
+                <FormLabel>{{ $t('Set_account_name') }}</FormLabel>
+              </div>
+              <div class="value">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  vid="newAccountName"
+                  :name="$t('newAccountName')"
+                  :rules="validationRules.newAccountName"
+                  tag="div"
+                  class="inline-container"
+                >
+                  <ErrorTooltip :errors="errors">
+                    <div class="full-width-item-container">
+                      <input
+                        v-model="formItems.accountName"
+                        v-focus
+                        class="full-width-item-container input-size input-style"
+                        :placeholder="$t('account_name')"
+                      >
+                    </div>
+                  </ErrorTooltip>
+                </ValidationProvider>
+              </div>
             </div>
-            <div class="value">
-              <ValidationProvider
-                v-slot="{ errors }"
-                vid="newAccountName"
-                :name="$t('newAccountName')"
-                :rules="validationRules.newAccountName"
-                tag="div"
-                class="inline-container"
-              >
-                <ErrorTooltip :errors="errors">
-                  <div class="full-width-item-container">
-                    <input
-                      v-model="formItems.accountName"
-                      v-focus
-                      class="full-width-item-container input-size input-style"
-                      :placeholder="$t('account_name')"
-                    >
-                  </div>
-                </ErrorTooltip>
-              </ValidationProvider>
+            <div class="form-rowr">
+              <div class="label">
+                <FormLabel>{{ $t('Set_password') }}</FormLabel>
+              </div>
+              <div class="value">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  vid="newPassword"
+                  mode="lazy"
+                  :name="$t('password')"
+                  :rules="validationRules.password"
+                  tag="div"
+                  class="inline-container"
+                >
+                  <ErrorTooltip :errors="errors">
+                    <div class="full-width-item-container">
+                      <input
+                        ref="passwordInput"
+                        v-model="formItems.password"
+                        class="full-width-item-container input-size input-style"
+                        :placeholder="$t('please_enter_your_wallet_password')"
+                        type="password"
+                      >
+                    </div>
+                  </ErrorTooltip>
+                </ValidationProvider>
+              </div>
             </div>
-          </div>
-          <div class="form-rowr">
-            <div class="label">
-              <FormLabel>{{ $t('Set_password') }}</FormLabel>
+            <div class="form-row">
+              <div class="label">
+                <FormLabel>{{ $t('Set_repeat_password') }}</FormLabel>
+              </div>
+              <div class="value">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  vid="confirmPassword"
+                  :name="$t('confirmPassword')"
+                  :rules="validationRules.confirmPassword"
+                  tag="div"
+                  class="inline-container"
+                >
+                  <ErrorTooltip :errors="errors">
+                    <div class="full-width-item-container">
+                      <input
+                        v-model="formItems.passwordAgain"
+                        class="full-width-item-container input-size input-style"
+                        data-vv-name="confirmPassword"
+                        :placeholder="$t('please_enter_your_new_password_again')"
+                        type="password"
+                      >
+                    </div>
+                  </ErrorTooltip>
+                </ValidationProvider>
+              </div>
             </div>
-            <div class="value">
-              <ValidationProvider
-                v-slot="{ errors }"
-                vid="newPassword"
-                mode="lazy"
-                :name="$t('password')"
-                :rules="validationRules.password"
-                tag="div"
-                class="inline-container"
-              >
-                <ErrorTooltip :errors="errors">
-                  <div class="full-width-item-container">
-                    <input
-                      ref="passwordInput"
-                      v-model="formItems.password"
-                      class="full-width-item-container input-size input-style"
-                      :placeholder="$t('please_enter_your_wallet_password')"
-                      type="password"
-                    >
-                  </div>
-                </ErrorTooltip>
-              </ValidationProvider>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="label">
-              <FormLabel>{{ $t('Set_repeat_password') }}</FormLabel>
-            </div>
-            <div class="value">
-              <ValidationProvider
-                v-slot="{ errors }"
-                vid="confirmPassword"
-                :name="$t('confirmPassword')"
-                :rules="validationRules.confirmPassword"
-                tag="div"
-                class="inline-container"
-              >
-                <ErrorTooltip :errors="errors">
-                  <div class="full-width-item-container">
-                    <input
-                      v-model="formItems.passwordAgain"
-                      class="full-width-item-container input-size input-style"
-                      data-vv-name="confirmPassword"
-                      :placeholder="$t('please_enter_your_new_password_again')"
-                      type="password"
-                    >
-                  </div>
-                </ErrorTooltip>
-              </ValidationProvider>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="lable">
-              <FormLabel>{{ $t('Set_password_hint') }}</FormLabel>
-            </div>
-            <div class="value">
-              <ValidationProvider
-                v-slot="{ errors }"
-                vid="hint"
-                :name="$t('hint')"
-                :rules="validationRules.message"
-                tag="div"
-                class="inline-container"
-              >
-                <ErrorTooltip :errors="errors">
-                  <div class="full-width-item-container">
-                    <input
-                      v-model="formItems.hint"
-                      class="full-width-item-container input-size input-style"
-                    >
-                  </div>
-                </ErrorTooltip>
-              </ValidationProvider>
+            <div class="form-row">
+              <div class="lable">
+                <FormLabel>{{ $t('Set_password_hint') }}</FormLabel>
+              </div>
+              <div class="value">
+                <ValidationProvider
+                  v-slot="{ errors }"
+                  vid="hint"
+                  :name="$t('hint')"
+                  :rules="validationRules.message"
+                  tag="div"
+                  class="inline-container"
+                >
+                  <ErrorTooltip :errors="errors">
+                    <div class="full-width-item-container">
+                      <input
+                        v-model="formItems.hint"
+                        class="full-width-item-container input-size input-style"
+                      >
+                    </div>
+                  </ErrorTooltip>
+                </ValidationProvider>
+              </div>
             </div>
           </div>
         </form>
       </ValidationObserver>
     </FormWrapper>
 
-    <div class="right-hints-section">
+    <div class="right-container">
       <div class="warm-tips-title">
         {{ $t('Warm_tips') }}
       </div>
@@ -129,7 +131,7 @@
       </div>
     </div>
    
-    <div class="flex-container mt-3">
+    <!--<div class="flex-container mt-3">
       <button
         type="button"
         class="button-style back-button" 
@@ -144,7 +146,7 @@
       >
         {{ $t('next') }}
       </button>
-    </div>
+    </div>-->
   </div>
 </template>
 
@@ -153,26 +155,51 @@ import {FormAccountSettingTs} from './FormAccountSettingTs'
 export default class FormAccountSetting extends FormAccountSettingTs {}
 </script>
 
-<style>
+<style lang="less" scoped>
+@import "../../../views/resources/css/variables.less";
+.account-setting-container {
+  display: inline-block;
+  width: 100%;
+  clear: both;
+  min-height: 71px;
+  .form-row {
+    width: 100%;
+    margin-top: 15px;
+    display: flex;
+  }
+  .label {
+    display: inline-block;
+    text-align: right;
+    font-size: @normalFont;
+    width: 100%;
+    margin-right: 25px;
+    margin-top: 10px;
+  }
+  .value {
+    float: left;
+    font-size: @smallerFont;
+    font-weight: bolder;
+  }
+}
 .warm-tips-title {
-  padding-bottom: 34px;
-  font-weight: 600;
-  color:rgba(51,51,51,1);
-  font-size:20px;
-  font-weight:400;
-}
+    padding-bottom: 34px;
+    font-weight: 600;
+    color:rgba(51,51,51,1);
+    font-size:20px;
+    font-weight:400;
+  }
 .warm-tips-text {
-  padding-bottom: 10px;
-  font-size:20px;
-  font-weight:400;
-  color:rgba(51,51,51,1);
+    padding-bottom: 10px;
+    font-size:20px;
+    font-weight:400;
+    color:rgba(51,51,51,1);
 }
-.right-hints-section {
-  display: block;
-  position: absolute;
-  width: 5rem;
-  float: left;
-  left: 10.5rem;
-  top: 2.5rem;
-}
+.right-container {
+    display: block;
+    position: absolute;
+    width: 5rem;
+    float: left;
+    left: 10.5rem;
+    top: 2.5rem;
+  }
 </style>

@@ -439,6 +439,7 @@
   "Import_an_old_account": "导入一个老账户",
   "Account_creation_description": "在开始使用本程序之前，你需要为自己创建一个账户和密码来方便管理自己的钱包资产",
   
+  "Set_seed_hash": "助记词HASH",
   "Set_account_name": "设置账户名",
   "Set_password":"设置加密密码",
   "Set_repeat_password":"确认密码",

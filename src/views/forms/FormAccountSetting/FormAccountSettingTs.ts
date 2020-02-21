@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Component, Vue} from 'vue-property-decorator'
-import {mapGetters} from 'vuex'
-import {NetworkType, Password} from 'nem2-sdk'
-
-// internal dependencies
-import {ValidationRuleset} from '@/core/validation/ValidationRuleset'
-import {NotificationType} from '@/core/utils/NotificationType'
-import {AccountService} from '@/services/AccountService'
-import {AccountsRepository} from '@/repositories/AccountsRepository'
-import {AccountsModel} from '@/core/database/entities/AccountsModel'
-
-// child components
-import {ValidationObserver, ValidationProvider} from 'vee-validate'
 // @ts-ignore
 import ErrorTooltip from '@/components/ErrorTooltip/ErrorTooltip.vue'
 // @ts-ignore
-import FormWrapper from '@/components/FormWrapper/FormWrapper.vue'
-// @ts-ignore
 import FormLabel from '@/components/FormLabel/FormLabel.vue'
+// @ts-ignore
+import FormWrapper from '@/components/FormWrapper/FormWrapper.vue'
+import { AccountsModel } from '@/core/database/entities/AccountsModel'
+import { NotificationType } from '@/core/utils/NotificationType'
+// internal dependencies
+import { ValidationRuleset } from '@/core/validation/ValidationRuleset'
+import { AccountsRepository } from '@/repositories/AccountsRepository'
+import { AccountService } from '@/services/AccountService'
+import { NetworkType, Password } from 'nem2-sdk'
+// child components
+import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import { Component, Vue } from 'vue-property-decorator'
+import { mapGetters } from 'vuex'
+
+
 
 /// region custom types
 type NetworkNodeEntry = {value: NetworkType, label: string}
@@ -50,7 +50,7 @@ type NetworkNodeEntry = {value: NetworkType, label: string}
     currentAccount: 'account/currentAccount',
   })},
 })
-export class FormAccountCreationTs extends Vue {
+export class FormAccountSettingTs extends Vue {
   /**
    * Currently active account
    * @see {Store.Account}

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {createStepImage, importStepImage} from '@/views/resources/Images'
-import {AppRoute} from './AppRoute'
 import i18n from '@/language'
+import { createStepImage, importStepImage } from '@/views/resources/Images'
+import { AppRoute } from './AppRoute'
 
 export const routes: AppRoute[] = [
   {
@@ -60,7 +60,7 @@ export const routes: AppRoute[] = [
                   nextPage:'accounts.createAccount.generateMnemonic',
                 },
                 // @ts-ignore
-                component: () => import('@/views/forms/FormAccountCreation/FormAccountCreation.vue'),
+                component: () => import('@/views/forms/FormAccountSetting/FormAccountSetting.vue'),
               }, {
                 path: 'generateMnemonic',
                 name: 'accounts.createAccount.generateMnemonic',
@@ -114,7 +114,7 @@ export const routes: AppRoute[] = [
                 nextPage:'accounts.importAccount.importMnemonic',
               },
               // @ts-ignore
-              component: () => import('@/views/forms/FormAccountCreation/FormAccountCreation.vue'),
+              component: () => import('@/views/forms/FormAccountSetting/FormAccountSetting.vue'),
             },{
               path: 'importMnemonic',
               name: 'accounts.importAccount.importMnemonic',

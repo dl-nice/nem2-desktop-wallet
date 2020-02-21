@@ -32,7 +32,6 @@ import { Component, Vue } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
 
 
-
 /// region custom types
 type NetworkNodeEntry = {value: NetworkType, label: string}
 /// end-region custom types

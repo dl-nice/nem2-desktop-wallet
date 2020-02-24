@@ -1,10 +1,13 @@
 import {Vue, Component} from 'vue-property-decorator'
 // @ts-ignore
 import RightTipDisplay from '@/components/RightTipDisplay/RightTipDisplay.vue'
+// @ts-ignore
+import ButtonStep from '@/components/ButtonStep/ButtonStep.vue'
 
 @Component({
   components: {
     RightTipDisplay,
+    ButtonStep,
   },
 })
 export default class BackupMnemonicTs extends Vue {

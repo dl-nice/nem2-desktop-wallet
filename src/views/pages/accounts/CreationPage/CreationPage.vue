@@ -1,9 +1,12 @@
 <template>
   <div class="create-page-wrapper">
     <div class="step-box-container">
-      <StepBar :current-step="parseInt($route.meta.title, 10)" />
+      <StepBar :current-step="parseInt($route.meta.extension, 10)" />
     </div>
     <div class="page-detail-container">
+      <div v-if="$route.meta.title.length !== 0" class="page-content-title">
+        {{ $route.meta.title }}
+      </div>
       <router-view />
     </div>
     <div class="button-container">

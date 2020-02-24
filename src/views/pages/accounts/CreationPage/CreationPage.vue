@@ -10,15 +10,15 @@
       <router-view />
     </div>
     <div class="button-container">
-      <span>btn1</span>
-      <span>btn2</span>
+      <ButtonStep>上一步</ButtonStep>
+      <ButtonStep>下一步</ButtonStep>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import CreationPageTs from './CreationPageTs'
-import './CreationPage.less'
+import CreationPageTs from "./CreationPageTs";
+import "./CreationPage.less";
 export default class CreationPage extends CreationPageTs {}
 </script>
 

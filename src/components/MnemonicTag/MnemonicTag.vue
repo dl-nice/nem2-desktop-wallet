@@ -4,7 +4,7 @@
       ghost-class="ghost" :diabled="isDraggable"
       @end="drag = false"
     >
-      <span>
+      <span class="tag-box-container">
         <Tag
           :closable="closable" class="tag-box" :class="{'active-tag': isActive}"
           @on-close="$emit('on-close')"

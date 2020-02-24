@@ -1,8 +1,5 @@
 <template>
   <div class="import-mnemonic-wrapper">
-    <!-- <div class="import-mnemonic-title">
-      输入助记词
-    </div> -->
     <div class="import-mnemonic-type">
       <RadioGroup v-model="mnemonicType">
         <Radio label="1">
@@ -13,10 +10,10 @@
         </Radio>
       </RadioGroup>
     </div>
-    <textarea class="show-mnemonic" />
+    <textarea v-model="mnemonicContent" class="show-mnemonic" />
     <p class="bottom-text">
       助记词HASH码：
-      <span>NAN…</span>
+      <span>{{ hashCode }}</span>
     </p>
   </div>
 </template>

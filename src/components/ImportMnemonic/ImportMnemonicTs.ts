@@ -2,8 +2,12 @@ import {Vue, Component, Prop} from 'vue-property-decorator'
 
 @Component
 export default class ImportMnemonicTs extends Vue {
-  @Prop()
+  @Prop({
+    default: '1',
+  })
+  mnemonicType: string
 
+  hashCode: string = 'NaN...'
 
-  mnemonicType: string = '1'
+  mnemonicContent: string
 }

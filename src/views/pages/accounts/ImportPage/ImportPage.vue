@@ -4,9 +4,9 @@
       <StepBar :step-list="stepList" :current-step="parseInt($route.meta.title, 10)" />
     </div>
     <div class="page-detail-container">
-      <div class="page-content-title">
+      <!--<div class="page-content-title">
         验证备份的助记词
-      </div>
+      </div>-->
       <router-view />
     </div>
     <div class="button-container">

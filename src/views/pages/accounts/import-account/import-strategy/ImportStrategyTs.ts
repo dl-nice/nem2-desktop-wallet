@@ -62,4 +62,10 @@ export default class ImportStrategyTs extends Vue {
       },
     })
   }
+
+  testModel: boolean = false
+
+  get isTestModel() {
+    return this.testModel
+  }
 }

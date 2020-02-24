@@ -4,19 +4,25 @@
       <StepBar :current-step="parseInt($route.meta.extension, 10)" />
     </div>
     <div class="page-detail-container">
-      <div v-if="$route.meta.title.length !== 0" class="page-content-title">{{ $route.meta.title }}</div>
+      <div v-if="$route.meta.title && $route.meta.title.length !== 0" class="page-content-title">
+        {{ $route.meta.title }}
+      </div>
       <router-view />
     </div>
     <div class="button-container">
-      <ButtonStep>上一步</ButtonStep>
-      <ButtonStep>下一步</ButtonStep>
+      <ButtonStep @click="$router.go(-1)">
+        上一步
+      </ButtonStep>
+      <ButtonStep :primary="true" @click="$router.push({name: $route.meta.nextPage})">
+        下一步
+      </ButtonStep>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import CreationPageTs from "./CreationPageTs";
-import "./CreationPage.less";
+import CreationPageTs from './CreationPageTs'
+import './CreationPage.less'
 export default class CreationPage extends CreationPageTs {}
 </script>
 

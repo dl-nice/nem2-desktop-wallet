@@ -157,6 +157,7 @@ export const routes: AppRoute[] = [
                 meta: { 
                   protected: false,
                   extension: '1',
+                  nextPage: 'accounts.creation.backupMnemonic',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/GenerateMnemonic/GenerateMnemonic.vue'),
@@ -168,6 +169,7 @@ export const routes: AppRoute[] = [
                   protected: false,
                   title: '备份好助记词',
                   extension: '2',
+                  nextPage: 'accounts.creation.verifyMnemonic',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/BackupMnemonic/BackupMnemonic.vue'),
@@ -179,6 +181,7 @@ export const routes: AppRoute[] = [
                   protected: false,
                   title: '验证备份的助记词',
                   extension: '3',
+                  nextPage: 'accounts.creation.accountInfo',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/VerifyMnemonic/VerifyMnemonic.vue'),
@@ -190,6 +193,7 @@ export const routes: AppRoute[] = [
                   protected: false,
                   title: '账户设置',
                   extension: '4',
+                  nextPage: 'accounts.creation.generateWallet',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/AccountInfo/AccountInfo.vue'),
@@ -201,6 +205,7 @@ export const routes: AppRoute[] = [
                   protected: false,
                   title: '导入钱包',
                   extension: '5',
+                  nextPage: 'dashboard',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/GenerateWallet/GenerateWallet.vue'),
@@ -221,6 +226,7 @@ export const routes: AppRoute[] = [
                   protected: false,
                   title: '输入助记词',
                   extension: '1',
+                  nextPage: 'accounts.import.accountInfo',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/ImportPage/ImportMnemonic/ImportMnemonic.vue'),
@@ -232,6 +238,7 @@ export const routes: AppRoute[] = [
                   protected: false,
                   title: '账户设置',
                   extension: '2',
+                  nextPage: 'accounts.import.generateWallet',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/ImportPage/AccountInfo/AccountInfo.vue'),
@@ -243,6 +250,7 @@ export const routes: AppRoute[] = [
                   protected: false,
                   title: '导入钱包',
                   extension: '3',
+                  nextPage: 'dashboard',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/ImportPage/GenerateWallet/GenerateWallet.vue'),

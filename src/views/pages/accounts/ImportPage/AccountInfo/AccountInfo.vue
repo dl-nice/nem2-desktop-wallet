@@ -8,7 +8,7 @@
         :tip-content="tipContents"
       />
     </div>
-    <button
+    <!-- <button
       type="button"
       class="button-style back-button" 
       @click="$router.push({name: 'accounts.login'})"
@@ -21,7 +21,7 @@
       @click="handleSubmit(submit)"
     >
       {{ $t('next') }}
-    </button>
+    </button> -->
   </div>
 </template>
 

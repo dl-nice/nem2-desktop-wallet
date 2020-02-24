@@ -13,12 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Component, Vue, Prop} from 'vue-property-decorator'
+import {Component, Prop, Vue} from 'vue-property-decorator'
+import draggable from 'vuedraggable'
 
-@Component
-export class ButtonStepTs extends Vue {
+@Component({
+  components: {
+    draggable,
+  },
+})
+export class MnemonicTagTs extends Vue {
   @Prop({
     default: false,
   })
-  primary: boolean
+  isDraggable: boolean
+
+  @Prop({
+    default: false,
+  })
+  closable: boolean
+
+  @Prop({
+    default: false,
+  })
+  clickable: boolean
+
+  @Prop({
+    required: true,
+  })
+  tagName: string
+
+  @Prop({
+    default: false,
+  })
+  isSelected: boolean
+
+  get isActive() {
+    return this.isSelected
+  }
 }

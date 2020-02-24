@@ -1,6 +1,8 @@
 <template>
   <div class="verify-mnemonic-page-wrapper">
-    <div class="verify-mnemonic-container" />
+    <div class="verify-mnemonic-container">
+      <MnemonicVerification :words="mnemonicWords" />
+    </div>
     <div class="right-tip-container">
       <RightTipDisplay 
         :tip-content="tipContents"

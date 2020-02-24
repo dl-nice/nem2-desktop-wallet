@@ -1,12 +1,12 @@
 import {Vue, Component} from 'vue-property-decorator'
 // @ts-ignore
 import StepBar from '@/components/StepBar/StepBar.vue'
-//@ts-ignore
+// @ts-ignore
 import ButtonStep from '@/components/ButtonStep/ButtonStep.vue'
 
 @Component({
   components: {
-    StepBar,ButtonStep
+    StepBar,ButtonStep,
   },
 })
 export default class CreationPageTs extends Vue {

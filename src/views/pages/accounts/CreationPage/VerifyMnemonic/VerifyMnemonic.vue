@@ -1,12 +1,22 @@
 <template>
-  <div class="verify-mnemonic-page-wrapper">
-    <div class="verify-mnemonic-container">
-      <MnemonicVerification :words="mnemonicWords" />
+  <div>
+    <div class="verify-mnemonic-page-wrapper">
+      <div class="verify-mnemonic-container">
+        <MnemonicVerification :words="mnemonicWords" />
+      </div>
+      <div class="right-tip-container">
+        <RightTipDisplay 
+          :tip-content="tipContents"
+        />
+      </div>
     </div>
-    <div class="right-tip-container">
-      <RightTipDisplay 
-        :tip-content="tipContents"
-      />
+    <div class="button-container">
+      <ButtonStep @click="$router.go(-1)">
+        上一步
+      </ButtonStep>
+      <ButtonStep :primary="true" @click="$router.push({name: $route.meta.nextPage})">
+        下一步
+      </ButtonStep>
     </div>
   </div>
 </template>

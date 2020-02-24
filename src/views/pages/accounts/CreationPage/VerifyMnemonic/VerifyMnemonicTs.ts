@@ -3,11 +3,14 @@ import {Vue, Component} from 'vue-property-decorator'
 import RightTipDisplay from '@/components/RightTipDisplay/RightTipDisplay.vue'
 // @ts-ignore
 import MnemonicVerification from '@/components/MnemonicVerification/MnemonicVerification.vue'
+// @ts-ignore
+import ButtonStep from '@/components/ButtonStep/ButtonStep.vue'
 
 @Component({
   components: {
     RightTipDisplay,
     MnemonicVerification,
+    ButtonStep,
   },
 })
 export default class VerifyMnemonicTs extends Vue {

@@ -5,7 +5,7 @@
         <div class="title">
           区块链网络:
         </div>
-        <input type="text">
+        <input type="text" placeholder="symbol">
       </div>
       <div class="select-network">
         <div class="title">
@@ -17,6 +17,7 @@
       </div>
     </div>
     <TableTitle>选择钱包列表</TableTitle>
+    <div class="blank"></div>
     <SelectAccountTable />
   </div>
 </template>

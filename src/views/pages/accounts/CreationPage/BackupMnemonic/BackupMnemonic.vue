@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="backup-mnemonic-page-wrapper">
-      <div class="backup-mnemonic-container" />
+       <div class="backup-mnemonic-container">
+      <MnemonicDisplay :mnemonic-list="mnemonicList" />
+    </div>
       <div class="right-tip-container">
         <RightTipDisplay 
           :tip-content="tipContents"

@@ -18,7 +18,7 @@
       </div>
     </div>
     <TableTitle>选择钱包列表</TableTitle>
-    <div class="blank"></div>
+    <div class="blank" />
     <SelectAccountTable />
   </div>
       <div class="button-container">

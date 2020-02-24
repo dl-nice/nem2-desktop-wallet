@@ -156,7 +156,7 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.generateMnemonic',
                 meta: { 
                   protected: false,
-                  title: '1',
+                  extension: '1',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/GenerateMnemonic/GenerateMnemonic.vue'),
@@ -166,7 +166,8 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.backupMnemonic',
                 meta: {
                   protected: false,
-                  title: '2',
+                  title: '备份好助记词',
+                  extension: '2',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/BackupMnemonic/BackupMnemonic.vue'),
@@ -176,7 +177,8 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.verifyMnemonic',
                 meta: {
                   protected: false,
-                  title: '3',
+                  title: '验证备份的助记词',
+                  extension: '3',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/VerifyMnemonic/VerifyMnemonic.vue'),
@@ -186,7 +188,8 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.accountInfo',
                 meta: {
                   protected: false,
-                  title: '4',
+                  title: '账户设置',
+                  extension: '4',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/AccountInfo/AccountInfo.vue'),
@@ -196,7 +199,8 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.generateWallet',
                 meta: {
                   protected: false,
-                  title: '5',
+                  title: '导入钱包',
+                  extension: '5',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/CreationPage/GenerateWallet/GenerateWallet.vue'),
@@ -215,7 +219,8 @@ export const routes: AppRoute[] = [
                 name: 'accounts.import.importMnemonic',
                 meta: {
                   protected: false,
-                  title: '1',
+                  title: '输入助记词',
+                  extension: '1',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/ImportPage/ImportMnemonic/ImportMnemonic.vue'),
@@ -225,7 +230,8 @@ export const routes: AppRoute[] = [
                 name: 'accounts.import.accountInfo',
                 meta: {
                   protected: false,
-                  title: '2',
+                  title: '账户设置',
+                  extension: '2',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/ImportPage/AccountInfo/AccountInfo.vue'),
@@ -235,7 +241,8 @@ export const routes: AppRoute[] = [
                 name: 'accounts.import.generateWallet',
                 meta: {
                   protected: false,
-                  title: '3',
+                  title: '导入钱包',
+                  extension: '3',
                 },
                 // @ts-ignore
                 component: () => import('@/views/pages/accounts/ImportPage/GenerateWallet/GenerateWallet.vue'),

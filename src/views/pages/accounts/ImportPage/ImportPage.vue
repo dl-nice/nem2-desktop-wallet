@@ -10,8 +10,12 @@
       <router-view />
     </div>
     <div class="button-container">
-      <ButtonStep>上一步</ButtonStep>
-      <ButtonStep>下一步</ButtonStep>
+      <ButtonStep @click="$router.go(-1)">
+        上一步
+      </ButtonStep>
+      <ButtonStep :primary="true" @click="$router.push({name: $route.meta.nextPage})">
+        下一步
+      </ButtonStep>
     </div>
   </div>
 </template>

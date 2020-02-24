@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Component, Vue} from 'vue-property-decorator'
+import {Component, Vue, Prop} from 'vue-property-decorator'
 
 @Component
-//@ts-ignore
-export class ButtonStepTs extends Vue {}
+export class ButtonStepTs extends Vue {
+  @Prop({
+    default: false,
+  })
+  primary: boolean
+}

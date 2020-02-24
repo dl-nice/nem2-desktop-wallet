@@ -1,8 +1,5 @@
 <template>
   <div class="form-account-setting">
-    <div class="title">
-      {{ $t('Set_account_password') }}
-    </div>
     <div class="form-value">
       <FormWrapper>
         <ValidationObserver v-slot="{ handleSubmit }">

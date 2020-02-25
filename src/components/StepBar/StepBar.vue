@@ -11,7 +11,7 @@
             {{ item.isChild ? '' : item.index }}
           </div>
           <div class="node-text">
-            {{ item.text }}
+            {{ $t(item.text) }}
           </div>
         </div>
       </div>

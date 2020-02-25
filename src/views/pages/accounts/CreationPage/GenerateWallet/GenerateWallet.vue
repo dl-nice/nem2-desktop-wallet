@@ -1,35 +1,35 @@
 <template>
-<div>
-  <div class="generate-wallet-page-wrapper">
-    <div class="import-wallet">
-      <div class="select-network">
-        <div class="title">
-          区块链网络:
+  <div>
+    <div class="generate-wallet-page-wrapper">
+      <div class="import-wallet">
+        <div class="select-network">
+          <div class="title">
+            {{ $t('chain_net') }}:
+          </div>
+          <input type="text" placeholder="symbol">
         </div>
-        <input type="text" placeholder="symbol">
-      </div>
-      <div class="select-network">
-        <div class="title">
-          网络类型:
+        <div class="select-network">
+          <div class="title">
+            {{ $t('Network_type') }}:
+          </div>
+          <Select name class>
+            <Option>TEXT-NET</Option>
+          </Select>
         </div>
-        <Select name class>
-          <Option>TEXT-NET</Option>
-        </Select>
       </div>
+      <TableTitle>{{ $t('select_wallet_list') }}</TableTitle>
+      <div class="blank" />
+      <SelectAccountTable />
     </div>
-    <TableTitle>选择钱包列表</TableTitle>
-    <div class="blank" />
-    <SelectAccountTable />
-  </div>
-      <div class="button-container">
+    <div class="button-container">
       <ButtonStep @click="$router.go(-1)">
-        上一步
+        {{ $t('Previous_step') }}
       </ButtonStep>
       <ButtonStep :primary="true" @click="$router.push({name: $route.meta.nextPage})">
-        下一步
+        {{ $t('Next_step') }}
       </ButtonStep>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>

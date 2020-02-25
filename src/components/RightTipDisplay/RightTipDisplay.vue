@@ -1,10 +1,10 @@
 <template>
   <div class="right-tip-wrapper">
     <div class="tip-title">
-      {{ tipTitle }}
+      {{ $t(tipTitle) }}
     </div>
     <div v-for="(item, index) in tipContent" :key="index" class="tip-content-paragraph">
-      {{ item }}
+      {{ $t(item) }}
     </div>
   </div>
 </template>

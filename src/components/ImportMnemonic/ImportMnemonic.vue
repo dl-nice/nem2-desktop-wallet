@@ -3,16 +3,16 @@
     <div class="import-mnemonic-type">
       <RadioGroup v-model="mnemonicType">
         <Radio label="1">
-          <span>12位助记词</span>
+          <span>{{ $t('twelve_words') }}</span>
         </Radio>
         <Radio label="2">
-          <span>24位助记词</span>
+          <span>{{ $t('twenty_four_words') }}</span>
         </Radio>
       </RadioGroup>
     </div>
     <textarea v-model="mnemonicContent" class="show-mnemonic" />
     <p class="bottom-text">
-      助记词HASH码：
+      {{ $t('mnemonic_hash_code') }}：
       <span>{{ hashCode }}</span>
     </p>
   </div>

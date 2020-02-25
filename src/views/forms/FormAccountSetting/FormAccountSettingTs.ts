@@ -45,7 +45,6 @@ type NetworkNodeEntry = {value: NetworkType, label: string}
     FormLabel,
   },
   computed: {...mapGetters({
-    networkType: 'network/networkType',
     generationHash: 'network/generationHash',
     currentAccount: 'account/currentAccount',
   })},
@@ -58,12 +57,12 @@ export class FormAccountSettingTs extends Vue {
    */
   public currentAccount: AccountsModel
 
-  /**
+  /** 
    * Currently active network type
    * @see {Store.Network}
-   * @var {NetworkType}
+   * @var {string}
    */
-  public networkType: NetworkType
+  public generationHash: string
 
   /**
    * Accounts repository
@@ -89,22 +88,22 @@ export class FormAccountSettingTs extends Vue {
     networkType: NetworkType.TEST_NET,
   }
 
-  /**
-   * Network types
-   * @var {NetworkNodeEntry[]}
-   */
-  public networkTypeList: NetworkNodeEntry[] = [
-    {value: NetworkType.MIJIN_TEST, label: 'MIJIN_TEST'},
-    {value: NetworkType.MAIN_NET, label: 'MAIN_NET'},
-    {value: NetworkType.TEST_NET, label: 'TEST_NET'},
-    {value: NetworkType.MIJIN, label: 'MIJIN'},
-  ]
+  ///**
+  // * Network types
+  // * @var {NetworkNodeEntry[]}
+  // */
+  //public networkTypeList: NetworkNodeEntry[] = [
+  //  {value: NetworkType.MIJIN_TEST, label: 'MIJIN_TEST'},
+  //  {value: NetworkType.MAIN_NET, label: 'MAIN_NET'},
+  //  {value: NetworkType.TEST_NET, label: 'TEST_NET'},
+  //  {value: NetworkType.MIJIN, label: 'MIJIN'},
+  //]
 
-/// region computed properties getter/setter
+  /// region computed properties getter/setter
   get nextPage() {
     return this.$route.meta.nextPage
   }
-/// end-region computed properties getter/setter
+  /// end-region computed properties getter/setter
 
   /**
    * Submit action, validates form and creates account in storage
@@ -126,13 +125,12 @@ export class FormAccountSettingTs extends Vue {
     
     // - populate model
     const model = new AccountsModel(new Map<string, any>([
-      ['accountName', this.formItems.accountName],
-      ['wallets', []],
-      ['password', passwordHash],
-      ['hint', this.formItems.hint],
-      ['networkType', this.networkType],
-      ['seed', ''],
-      //['generationHash', this.generationHash]
+      [ 'accountName', this.formItems.accountName ],
+      [ 'wallets', [] ],
+      [ 'password', passwordHash ],
+      [ 'hint', this.formItems.hint ],
+      [ 'seed', '' ],
+      [ 'generationHash', this.generationHash ],
     ]))
 
     // use repository for storage

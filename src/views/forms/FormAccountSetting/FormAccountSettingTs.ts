@@ -23,7 +23,6 @@ import { AccountsModel } from '@/core/database/entities/AccountsModel'
 import { NotificationType } from '@/core/utils/NotificationType'
 // internal dependencies
 import { ValidationRuleset } from '@/core/validation/ValidationRuleset'
-import { AccountsRepository } from '@/repositories/AccountsRepository'
 import { AccountService } from '@/services/AccountService'
 import { NetworkType, Password } from 'nem2-sdk'
 // child components
@@ -80,19 +79,6 @@ export class FormAccountSettingTs extends Vue {
     passwordAgain: '',
     hint: '',
   }
-
-  ///**
-  // * Network types
-  // * @var {NetworkNodeEntry[]}
-  // */
-  //public networkTypeList: NetworkNodeEntry[] = [
-  //  {value: NetworkType.MIJIN_TEST, label: 'MIJIN_TEST'},
-  //  {value: NetworkType.MAIN_NET, label: 'MAIN_NET'},
-  //  {value: NetworkType.TEST_NET, label: 'TEST_NET'},
-  //  {value: NetworkType.MIJIN, label: 'MIJIN'},
-  //]
-
-  /// region computed properties getter/setter
   get nextPage() {
     return this.$route.meta.nextPage
   }

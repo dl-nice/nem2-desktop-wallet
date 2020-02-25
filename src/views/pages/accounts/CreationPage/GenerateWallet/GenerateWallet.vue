@@ -13,7 +13,9 @@
             网络类型:
           </div>
           <Select name class>
-            <Option>TEXT-NET</Option>
+            <Option v-for="(item,index) in networkTypeList" :key="index" :value="item.value">
+              {{ item.label }}
+            </Option>
           </Select>
         </div>
       </div>

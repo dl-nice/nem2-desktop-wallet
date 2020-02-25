@@ -133,7 +133,7 @@
                   上一步
                 </button>
                 <button
-                  type="submit"
+                  type="button"
                   class="button-style validation-button" 
                   @click="handleSubmit(submit)"
                 >

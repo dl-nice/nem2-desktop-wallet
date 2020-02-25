@@ -21,7 +21,7 @@
       </div>
       <TableTitle>选择钱包列表</TableTitle>
       <div class="blank" />
-      <SelectAccountTable />
+      <SelectAccountTable :wallet-list="walletList"/>
     </div>
     <div class="button-container">
       <ButtonStep @click="$router.go(-1)">

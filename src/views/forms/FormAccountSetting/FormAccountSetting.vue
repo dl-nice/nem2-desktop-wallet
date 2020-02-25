@@ -11,8 +11,10 @@
               <div class="value">
                 <div class="full-width-item-container">
                   <p
-                    class="input-size hash"
-                  >C6DAFB1CDDF22089C76E7130DB7B2919B9AD3AEF1CEEE44C2ABCF1252B4458D6</p>
+                    class="input-size"
+                  >
+                    C6DAFB1CDDF22089C76E7130DB7B2919B9AD3AEF1CEEE44C2ABCF1252B4458D6
+                  </p>
                 </div>
               </div>
             </div>
@@ -64,7 +66,7 @@
                         class="full-width-item-container input-size input-style"
                         :placeholder="$t('please_enter_your_wallet_password')"
                         type="password"
-                      />
+                      >
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -91,7 +93,7 @@
                         data-vv-name="confirmPassword"
                         :placeholder="$t('please_enter_your_new_password_again')"
                         type="password"
-                      />
+                      >
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -119,6 +121,24 @@
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
+              </div>
+            </div>
+            <div class="form-line-container form-row">
+              <div class="flex-container mt-3">
+                <button
+                  type="button"
+                  class="button-style back-button" 
+                  @click="$router.back()"
+                >
+                  上一步
+                </button>
+                <button
+                  type="submit"
+                  class="button-style validation-button" 
+                  @click="handleSubmit(submit)"
+                >
+                  下一步
+                </button>
               </div>
             </div>
           </form>

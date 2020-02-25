@@ -1,13 +1,13 @@
 <template>
   <div class="multisig-form-main-container">
-    <div class="left-container">
+    <div class="left-container xym-outline">
       <div class="form-section">
         <slot name="form-section" />
       </div>
     </div>
-    <div class="right-container">
+    <!-- <div class="right-container xym-outline">
       <slot name="right-section" />
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
@@ -20,14 +20,17 @@ export default class MultisigFormPage extends Vue {}
 
 <style lang="less" scoped>
 .multisig-form-main-container {
-  background-color: lightslategrey;
-  display: grid;
-  grid-template-columns: 12.7rem auto;
-  grid-template-rows: 100%;
+  position: relative;
   height: 100%;
-  overflow: hidden;
+  width: 100%;
+  padding: 0.2rem 0.1rem 0.35rem 0.2rem;
+  display: grid;
+  // grid-template-columns: 12.7rem auto;
+  grid-template-columns: 100%;
+  grid-template-rows: 100%;
 
   .left-container {
+    width: 98%;
     padding: 0.3rem 0.5rem;
     background-color: white;
   }

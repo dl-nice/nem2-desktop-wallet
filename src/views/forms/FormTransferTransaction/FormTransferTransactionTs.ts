@@ -32,6 +32,7 @@ import {Formatters} from '@/core/utils/Formatters'
 import {ViewTransferTransaction, TransferFormFieldsType} from '@/core/transactions/ViewTransferTransaction'
 import {FormTransactionBase} from '@/views/forms/FormTransactionBase/FormTransactionBase'
 import {TransactionFactory} from '@/core/transactions/TransactionFactory'
+import {AddressValidator} from '@/core/validation/validators'
 
 
 // child components
@@ -39,11 +40,7 @@ import {ValidationObserver} from 'vee-validate'
 // @ts-ignore
 import AmountInput from '@/components/AmountInput/AmountInput.vue'
 // @ts-ignore
-import ButtonAdd from '@/components/ButtonAdd/ButtonAdd.vue'
-// @ts-ignore
 import FormWrapper from '@/components/FormWrapper/FormWrapper.vue'
-// @ts-ignore
-import MaxFeeSelector from '@/components/MaxFeeSelector/MaxFeeSelector.vue'
 // @ts-ignore
 import MessageInput from '@/components/MessageInput/MessageInput.vue'
 // @ts-ignore
@@ -58,15 +55,17 @@ import MosaicSelector from '@/components/MosaicSelector/MosaicSelector.vue'
 import RecipientInput from '@/components/RecipientInput/RecipientInput.vue'
 // @ts-ignore
 import SignerSelector from '@/components/SignerSelector/SignerSelector.vue'
+// @ts-ignore
+import MaxFeeAndSubmit from '@/components/MaxFeeAndSubmit/MaxFeeAndSubmit.vue'
+// @ts-ignore
+import FormRow from '@/components/FormRow/FormRow.vue'
 
 type MosaicAttachmentType = {id: MosaicId, mosaicHex: string, name: string, amount: number}
 
 @Component({
   components: {
     AmountInput,
-    ButtonAdd,
     FormWrapper,
-    MaxFeeSelector,
     MessageInput,
     ModalTransactionConfirmation,
     MosaicAttachmentDisplay,
@@ -75,6 +74,8 @@ type MosaicAttachmentType = {id: MosaicId, mosaicHex: string, name: string, amou
     RecipientInput,
     SignerSelector,
     ValidationObserver,
+    MaxFeeAndSubmit,
+    FormRow,
   },
 })
 export class FormTransferTransactionTs extends FormTransactionBase {
@@ -149,6 +150,15 @@ export class FormTransferTransactionTs extends FormTransactionBase {
 
     // - maxFee must be absolute
     this.formItems.maxFee = this.defaultFee
+  }
+
+  /**
+   * Getter for whether forms should aggregate transactions
+   * @see {FormTransactionBase}
+   * @return {boolean} True if creating transfer for multisig
+   */
+  protected isAggregateMode(): boolean {
+    return this.isCosignatoryMode
   }
 
   /**
@@ -236,8 +246,10 @@ export class FormTransferTransactionTs extends FormTransactionBase {
    */
   protected get instantiatedRecipient(): Address | NamespaceId {
     const {recipientRaw} = this.formItems
+
     if (!recipientRaw) return null
-    if ([ 40, 46 ].includes(recipientRaw.length)) {
+
+    if (AddressValidator.validate(recipientRaw)) {
       return Address.createFromRawAddress(recipientRaw)
     }
 

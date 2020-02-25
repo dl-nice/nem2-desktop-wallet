@@ -38,6 +38,9 @@ import {Formatters} from '@/core/utils/Formatters'
 import {TransactionFactory} from '@/core/transactions/TransactionFactory'
 import {ViewTransferTransaction} from '@/core/transactions/ViewTransferTransaction'
 import {NotificationType} from '@/core/utils/NotificationType'
+import {WalletService} from '@/services/WalletService'
+import {TransactionService} from '@/services/TransactionService'
+import {BroadcastResult} from '@/core/transactions/BroadcastResult'
 
 @Component({
   computed: {...mapGetters({
@@ -47,6 +50,7 @@ import {NotificationType} from '@/core/utils/NotificationType'
     currentWallet: 'wallet/currentWallet',
     currentWalletMosaics: 'wallet/currentWalletMosaics',
     currentMultisigInfo: 'wallet/currentMultisigInfo',
+    isCosignatoryMode: 'wallet/isCosignatoryMode',
     networkMosaic: 'mosaic/networkMosaic',
     stagedTransactions: 'wallet/stagedTransactions',
     mosaicsInfo: 'mosaic/mosaicsInfoList',
@@ -99,6 +103,12 @@ export class FormTransactionBase extends Vue {
   public currentMultisigInfo: MultisigAccountInfo
 
   /**
+   * Whether the form is in cosignatory mode (cosigner selected)
+   * @var {boolean}
+   */
+  public isCosignatoryMode: boolean
+
+  /**
    * Networks currency mosaic
    * @var {MosaicId}
    */
@@ -130,18 +140,16 @@ export class FormTransactionBase extends Vue {
 /// end-region store getters
 
 /// region property watches
-  @Watch('getTransactions')
-  onTransactionsChange(transactions: Transaction[]) {
-    this.$emit('onTransactionsChange', transactions)
+  @Watch('signers')
+  onSignersChange(signers: {publicKey: string, label: string}[] = []) {
+    this.resetForm()
   }
-/// end-region property watches
 
-  /**
-   * Whether the transaction should be signed by a different
-   * account than the active wallet.
-   * @var {boolean}
-   */
-  public currentSigner: string
+  // @Watch('getTransactions')
+  // onTransactionsChange(transactions: Transaction[]) {
+  //   this.$emit('onTransactionsChange', transactions)
+  // }
+/// end-region property watches
 
   /**
    * Whether the form is currently awaiting a signature
@@ -159,28 +167,15 @@ export class FormTransactionBase extends Vue {
    * Hook called when the component is mounted
    * @return {void}
    */
-  public mounted() {
+  public async mounted() {
     if (this.currentWallet) {
-      this.currentSigner = this.currentWallet.objects.publicAccount.publicKey
-
       const address = this.currentWallet.objects.address.plain()
-      try { this.$store.dispatch('wallet/REST_FETCH_MULTISIG', address) } catch(e) {}
       try { this.$store.dispatch('wallet/REST_FETCH_OWNED_NAMESPACES', address) } catch(e) {}
     }
   }
 
-/// region computed properties getter/setter
-  public get hasConfirmationModal(): boolean {
-    return this.isAwaitingSignature
-  }
-
-  public set hasConfirmationModal(f: boolean) {
-    this.isAwaitingSignature = f
-  }
-/// end-region computed properties getter/setter
-
   /**
-   * Hook called when the component is created
+   * Hook called when the component is mounted
    * @return {void}
    */
   public async created() {
@@ -189,11 +184,56 @@ export class FormTransactionBase extends Vue {
   }
 
   /**
+   * Hook called when the component is being destroyed (before)
+   * @return {void}
+   */
+  public beforeDestroy() {
+    this.$store.dispatch('wallet/SET_CURRENT_SIGNER', {model: this.currentWallet})
+  }
+
+/// region computed properties getter/setter
+  get signers(): {publicKey: string, label: string}[] {
+    return this.getSigners()
+  }
+
+  get multisigs(): {publicKey: string, label: string}[] {
+    const signers = this.getSigners()
+    if (!signers.length || !this.currentWallet) {
+      return []
+    }
+
+    // in case current wallet is multisig..
+    if (this.currentMultisigInfo && this.currentMultisigInfo.isMultisig()) {
+      return signers
+    }
+
+    // all signers except current wallet
+    return signers.splice(1)
+  }
+
+  get hasConfirmationModal(): boolean {
+    return this.isAwaitingSignature
+  }
+
+  set hasConfirmationModal(f: boolean) {
+    this.isAwaitingSignature = f
+  }
+/// end-region computed properties getter/setter
+
+  /**
    * Reset the form with properties
    * @throws {Error} If not overloaded in derivate component
    */
   protected resetForm() {
     throw new Error('Method \'resetForm()\' must be overloaded in derivate components.')
+  }
+
+  /**
+   * Getter for whether forms should aggregate transactions
+   * @throws {Error} If not overloaded in derivate component
+   */
+  protected isAggregateMode(): boolean {
+    throw new Error('Method \'isAggregateMode()\' must be overloaded in derivate components.')
   }
 
   /**
@@ -227,7 +267,44 @@ export class FormTransactionBase extends Vue {
    * @param {string} signerPublicKey 
    */
   public onChangeSigner(signerPublicKey: string) {
-    this.currentSigner = signerPublicKey
+    const isCosig = this.currentWallet.values.get('publicKey') !== signerPublicKey
+    const payload = !isCosig ? this.currentWallet : {
+      networkType: this.networkType,
+      publicKey: signerPublicKey
+    }
+
+    this.$store.dispatch('wallet/SET_CURRENT_SIGNER', {model: payload})
+  }
+
+  /**
+   * Process form input
+   * @return {void}
+   */
+  public async onSubmit() {
+    const transactions = this.getTransactions()
+
+    this.$store.dispatch('diagnostic/ADD_DEBUG', 'Adding ' + transactions.length + ' transaction(s) to stage (prepared & unsigned)')
+
+    // - check whether transactions must be aggregated
+    // - also set isMultisig flag in case of cosignatory mode
+    if (this.isAggregateMode()) {
+      this.$store.commit('wallet/stageOptions', {
+        isAggregate: true,
+        isMultisig: this.isCosignatoryMode,
+      })
+    }
+
+    // - add transactions to stage (to be signed)
+    await Promise.all(transactions.map(
+      async (transaction) => {
+        await this.$store.dispatch(
+          'wallet/ADD_STAGED_TRANSACTION',
+          transaction
+        )
+      }))
+
+    // - open signature modal
+    this.onShowConfirmationModal()
   }
 
   /**
@@ -235,11 +312,39 @@ export class FormTransactionBase extends Vue {
    * the event 'success'
    * @return {void}
    */
-  public onConfirmationSuccess() {
+  public async onConfirmationSuccess(issuer: PublicAccount) {
     this.resetForm()
-    this.$store.dispatch('notification/ADD_SUCCESS', NotificationType.SUCCESS_ACCOUNT_UNLOCKED)
     this.hasConfirmationModal = false
     this.$emit('on-confirmation-success')
+
+    //XXX does the user want to broadcast NOW ?
+
+    // - read transaction stage options
+    const options = this.$store.getters['wallet/stageOptions']
+    const service = new TransactionService(this.$store)
+    let results: BroadcastResult[] = []
+
+    // - case 1 "announce partial"
+    if (options.isMultisig) {
+      results = await service.announcePartialTransactions(issuer)
+    }
+    // - case 2 "announce complete"
+    else {
+      results = await service.announceSignedTransactions()
+    }
+
+    // - notify about errors and exit
+    const errors = results.filter(result => false === result.success)
+    if (errors.length) {
+      errors.map(result => this.$store.dispatch('notification/ADD_ERROR', result.error))
+      return ;
+    }
+
+    // - notify about broadcast success (_transactions now unconfirmed_)
+    const message = options.isMultisig
+      ? 'success_transaction_partial_announced'
+      : 'success_transactions_announced'
+    this.$store.dispatch('notification/ADD_SUCCESS', message)
   }
 
   /**
@@ -259,27 +364,6 @@ export class FormTransactionBase extends Vue {
   public onConfirmationCancel() {
     this.$store.dispatch('wallet/RESET_TRANSACTION_STAGE')
     this.hasConfirmationModal = false
-  }
-
-  /**
-   * Process form input
-   * @return {void}
-   */
-  public async onSubmit() {
-
-    this.$store.dispatch('diagnostic/ADD_DEBUG', 'Adding transaction(s) to stage (prepared & unsigned): ' + this.getTransactions().length)
-
-    // - add transactions to stage (to be signed)
-    await Promise.all(this.getTransactions().map(
-      async (transaction) => {
-        await this.$store.dispatch(
-          'wallet/ADD_STAGED_TRANSACTION',
-          transaction
-        )
-      }))
-
-    // - open signature modal
-    this.onShowConfirmationModal()
   }
 
   /**
@@ -320,5 +404,45 @@ export class FormTransactionBase extends Vue {
   protected getAbsoluteFee(fee: number): number {
     const divisibility = this.getDivisibility(this.networkMosaic)
     return fee * Math.pow(10, divisibility)
+  }
+
+  /**
+   * Get a list of known signers given a `currentWallet`
+   * @return {{publicKey: string, label:string}[]}
+   */
+  protected getSigners(): {publicKey: string, label: string}[] {
+    if (!this.currentWallet) {
+      return []
+    }
+
+    const self = [
+      {
+        publicKey: this.currentWallet.values.get('publicKey'),
+        label: this.currentWallet.values.get('name'),
+      },
+    ]
+
+    if (!this.currentMultisigInfo) {
+      return self
+    }
+
+    const multisig = this.currentMultisigInfo
+
+    // in case "self" is a multi-signature account
+    if (multisig && multisig.isMultisig()) {
+      self[0].label = self[0].label + this.$t('label_postfix_multisig')
+    }
+
+    // add multisig accounts of which "self" is a cosignatory
+    if (multisig) {
+      const service = new WalletService(this.$store)
+      return self.concat(...multisig.multisigAccounts.map(
+        ({publicKey}) => ({
+          publicKey,
+          label: service.getWalletLabel(publicKey, this.networkType) + this.$t('label_postfix_multisig'),
+        })))
+    }
+
+    return self
   }
 }

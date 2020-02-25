@@ -48,4 +48,46 @@ export class MosaicsMigrations {
 
     return migrated
   }
+
+  /**
+   * Version 3 migration
+   * @description Setting new symbol.xym network mosaics
+   * @param rows 
+   * @returns {Map<string, MosaicsModel>}
+   */
+  public static version3_newSymbol(
+    rows: Map<string, MosaicsModel>
+  ): Map<string, MosaicsModel> {
+    const entities = Array.from(rows.values())
+    const migrated = new Map<string, MosaicsModel>()
+
+    // each row must be migrated (added table columns)
+    entities.map((outOfDate: MosaicsModel, i: number) => {
+      if ('symbol.xym' === outOfDate.values.get('name')) {
+        outOfDate.values.set('isCurrencyMosaic', true)
+        outOfDate.values.set('isHarvestMosaic', true)
+      }
+    })
+
+    return migrated
+  }
+
+  /**
+   * Version 4 migration
+   * @description Setting storing flags as numbers
+   * @param {Map<string, MosaicsModel>} rows
+   * @returns {Map<string, MosaicsModel>}
+   */
+  public static version4_flagsAsNumber(
+    rows: Map<string, MosaicsModel>,
+  ): Map<string, MosaicsModel> {
+    const entities = Array.from(rows.values())
+    const migrated = new Map<string, MosaicsModel>()
+    entities.map((outOfDate: MosaicsModel) => {
+      outOfDate.values.set('flags', outOfDate.values.get('flags').flags)
+      migrated.set(outOfDate.getIdentifier(), outOfDate)
+    })
+
+    return migrated
+  }
 }

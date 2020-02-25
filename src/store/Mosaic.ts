@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {MosaicId, MosaicInfo, NamespaceId, QueryParams, Transaction, TransactionType, NamespaceRegistrationType} from 'nem2-sdk'
+import {MosaicInfo, QueryParams, Transaction, TransactionType, NamespaceRegistrationType, UInt64} from 'nem2-sdk'
 import Vue from 'vue'
 
 // internal dependencies
 import {RESTService} from '@/services/RESTService'
 import {MosaicService} from '@/services/MosaicService'
-import {MosaicsModel} from '@/core/database/entities/MosaicsModel'
 import {AwaitLock} from './AwaitLock';
 const Lock = AwaitLock.create();
 
@@ -120,17 +119,20 @@ export default {
       await Lock.uninitialize(callback, {commit, dispatch, getters})
     },
 /// region scoped actions
-    async INITIALIZE_FROM_DB({commit, dispatch}, withFeed) {
-      const currencyMosaic = withFeed.mosaics.find(m => m.values.get('isCurrencyMosaic'))
-      const mosaicName = currencyMosaic.values.get('name')
+    async INITIALIZE_FROM_DB({commit, dispatch, rootGetters}, withFeed) {
+      const generationHash = rootGetters['network/generationHash']
+      const currencyMosaic = withFeed.mosaics.find(
+        m => m.values.get('isCurrencyMosaic')
+          && generationHash === m.values.get('generationHash')
+      )
 
-      dispatch('diagnostic/ADD_DEBUG', 'Store action mosaic/INITIALIZE_FROM_DB dispatched with currencyMosaic: ' + mosaicName, {root: true})
+      dispatch('diagnostic/ADD_DEBUG', 'Store action mosaic/INITIALIZE_FROM_DB dispatched with currencyMosaic: ' + currencyMosaic.values.get('name'), {root: true})
 
       // - set network currency mosaic
       dispatch('SET_NETWORK_CURRENCY_MOSAIC', {
         mosaic: currencyMosaic,
-        name: mosaicName,
-        ticker: mosaicName.split('.').pop().toUpperCase(),
+        name: currencyMosaic.values.get('name'),
+        ticker: currencyMosaic.values.get('name').split('.').pop().toUpperCase(),
         mosaicId: currencyMosaic.objects.mosaicId,
       })
 
@@ -153,7 +155,7 @@ export default {
       dispatch('diagnostic/ADD_DEBUG', 'Store action mosaic/INITIALIZE_FROM_NEMESIS dispatched with nodeUrl: ' + nodeUrl, {root: true})
 
       const blockHttp = RESTService.create('BlockHttp', nodeUrl)
-      blockHttp.getBlockTransactions('1', new QueryParams(100)).subscribe(
+      blockHttp.getBlockTransactions(UInt64.fromUint(1), new QueryParams().setPageSize(100)).subscribe(
         async (transactions: Transaction[]) => {
           const payload = await dispatch('GET_CURRENCY_MOSAIC_FROM_NEMESIS', transactions)
 
@@ -192,12 +194,12 @@ export default {
     GET_CURRENCY_MOSAIC_FROM_NEMESIS({commit, dispatch}, transactions) {
       // - read first root namespace
       const rootNamespaceTx = transactions.filter(
-        tx => tx.type === TransactionType.REGISTER_NAMESPACE
+        tx => tx.type === TransactionType.NAMESPACE_REGISTRATION
            && tx.registrationType === NamespaceRegistrationType.RootNamespace).shift()
 
       // - read sub namespace
       const subNamespaceTx = transactions.filter(
-        tx => tx.type === TransactionType.REGISTER_NAMESPACE 
+        tx => tx.type === TransactionType.NAMESPACE_REGISTRATION 
            && tx.registrationType === NamespaceRegistrationType.SubNamespace
            && tx.parentId.equals(rootNamespaceTx.namespaceId)).shift()
 
@@ -220,7 +222,8 @@ export default {
     },
     async REST_FETCH_INFO({commit, rootGetters}, mosaicId) {
       const nodeUrl = rootGetters['network/currentPeer'].url
-      const mosaicHttp = RESTService.create('MosaicHttp', nodeUrl)
+      const networkType = rootGetters['network/networkType']
+      const mosaicHttp = RESTService.create('MosaicHttp', nodeUrl, networkType)
       const mosaicInfo = await mosaicHttp.getMosaic(mosaicId).toPromise()
 
       commit('addMosaicInfo', mosaicInfo)
@@ -228,7 +231,8 @@ export default {
     },
     async REST_FETCH_INFOS({commit, rootGetters}, mosaicIds) {
       const nodeUrl = rootGetters['network/currentPeer'].url
-      const mosaicHttp = RESTService.create('MosaicHttp', nodeUrl)
+      const networkType = rootGetters['network/networkType']
+      const mosaicHttp = RESTService.create('MosaicHttp', nodeUrl, networkType)
       const mosaicsInfo = await mosaicHttp.getMosaics(mosaicIds).toPromise()
 
       mosaicsInfo.map(info => commit('addMosaicInfo', info))
@@ -236,7 +240,8 @@ export default {
     },
     async REST_FETCH_NAMES({commit, rootGetters}, mosaicIds): Promise<{hex: string, name: string}[]> {
       const nodeUrl = rootGetters['network/currentPeer'].url
-      const namespaceHttp = RESTService.create('NamespaceHttp', nodeUrl)
+      const networkType = rootGetters['network/networkType']
+      const namespaceHttp = RESTService.create('NamespaceHttp', nodeUrl, networkType)
       const mosaicNames = await namespaceHttp.getMosaicsNames(mosaicIds).toPromise()
 
       // map by hex if names available

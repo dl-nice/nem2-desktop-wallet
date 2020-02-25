@@ -1,6 +1,6 @@
 <template>
   <div class="generate-mnemonic-page-wrapper">
-    <div class="progress-container" @mouseover="addValue">
+    <div class="progress-container" @mouseover="handleMousemove">
       <ProgressDisplay :value="value" />
     </div>
   </div>

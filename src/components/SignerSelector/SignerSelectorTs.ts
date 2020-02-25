@@ -14,27 +14,13 @@
  * limitations under the License.
  */
 import {Component, Prop, Vue} from 'vue-property-decorator'
-import {mapGetters} from 'vuex'
-import {MultisigAccountInfo, PublicAccount, NetworkType} from 'nem2-sdk'
-
-// internal dependencies
-import {AccountsModel} from '@/core/database/entities/AccountsModel'
-import {WalletsModel} from '@/core/database/entities/WalletsModel'
-import {WalletService} from '@/services/WalletService'
 
 // child components
 // @ts-ignore
-import FormLabel from '@/components/FormLabel/FormLabel.vue'
+import FormRow from '@/components/FormRow/FormRow.vue'
 
 @Component({
-  components: {FormLabel},
-  computed: {...mapGetters({
-    networkType: 'network/networkType',
-    currentAccount: 'account/currentAccount',
-    currentWallet: 'wallet/currentWallet',
-    knownWallets: 'wallet/knownWallets',
-    multisigInfo: 'wallet/currentMultisigInfo',
-  })},
+  components: {FormRow},
 })
 export class SignerSelectorTs extends Vue {
   /**
@@ -45,54 +31,13 @@ export class SignerSelectorTs extends Vue {
     default: '',
   }) value: string
 
-  /**
-   * Currently active networkType
-   * @see {Store.Network}
-   * @var {NetworkType}
-   */
-  public networkType: NetworkType
+  @Prop({
+    default: () => []
+  }) signers: {publicKey: string, label: string}[]
 
-  /**
-   * Currently active account
-   * @see {Store.Account}
-   * @var {AccountsModel}
-   */
-  public currentAccount: AccountsModel
-
-  /**
-   * Currently active wallet
-   * @see {Store.Wallet}
-   * @var {WalletsModel}
-   */
-  public currentWallet: WalletsModel
-
-  /**
-   * Active account's wallets
-   * @see {Store.Wallet}
-   * @var {WalletsModel[]}
-   */
-  public knownWallets: WalletsModel[]
-
-  /**
-   * Active wallet's multisig info
-   * @see {Store.Wallet}
-   * @var {MultisigAccountInfo}
-   */
-  public multisigInfo: MultisigAccountInfo
-
-  /**
-   * Wallet service
-   * @var {WalletService}
-   */
-  public walletService: WalletService
-
-  /**
-   * Hook called when the component is mounted
-   * @return {void}
-   */
-  public async mounted() {
-    this.walletService = new WalletService(this.$store)
-  }
+  @Prop({
+    default: '',
+  }) label: string
 
   /// region computed properties getter/setter
   /**
@@ -107,37 +52,7 @@ export class SignerSelectorTs extends Vue {
    * Emit value change
    */
   set chosenSigner(newValue: string) {
-    this.$emit('input', newValue)
-  }
-
-  public get signers(): {publicKey: string, label: string}[] {
-    if (!this.currentWallet) {
-      return []
-    }
-
-    // "self"
-    const currentSigner = PublicAccount.createFromPublicKey(
-      this.currentWallet.values.get('publicKey'),
-      this.networkType,
-    )
-
-    // add multisig accounts
-    const self = [
-      {
-        publicKey: currentSigner.publicKey,
-        label: this.currentWallet.values.get('name'),
-      },
-    ]
-
-    if (this.multisigInfo) {
-      return self.concat(...this.multisigInfo.multisigAccounts.map(
-        ({publicKey}) => ({
-          publicKey,
-          label: this.walletService.getWalletLabel(publicKey, this.networkType),
-        })))
-    }
-
-    return self
+    this.$emit('change', newValue)
   }
 /// end-region computed properties getter/setter
 }

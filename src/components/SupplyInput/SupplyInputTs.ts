@@ -23,17 +23,28 @@ import {ValidationProvider} from 'vee-validate'
 // @ts-ignore
 import ErrorTooltip from '@/components/ErrorTooltip/ErrorTooltip.vue'
 // @ts-ignore
-import FormLabel from '@/components/FormLabel/FormLabel.vue'
+import FormRow from '@/components/FormRow/FormRow.vue'
 
 @Component({
   components: {
     ValidationProvider,
     ErrorTooltip,
-    FormLabel,
+    FormRow,
   },
 })
 export class SupplyInputTs extends Vue {
-  @Prop({ default: '' }) value: string
+  /**
+   * Value bound to parent v-model
+   * @type {string}
+   */
+  @Prop({ default: '' }) value: number
+
+
+  /**
+   * Form label
+   * @type {string}
+   */
+  @Prop({ default: 'supply' }) label: string
 
   /**
    * Validation rules
@@ -42,11 +53,11 @@ export class SupplyInputTs extends Vue {
   public validationRules = ValidationRuleset
 
 /// region computed properties getter/setter
-  public get chosenValue(): string {
+  public get chosenValue(): number {
     return this.value
   }
 
-  public set chosenValue(amount: string) {
+  public set chosenValue(amount: number) {
     this.$emit('input', amount)
   }
 /// end-region computed properties getter/setter

@@ -16,8 +16,6 @@
 // @ts-ignore
 import ErrorTooltip from '@/components/ErrorTooltip/ErrorTooltip.vue'
 // @ts-ignore
-import FormLabel from '@/components/FormLabel/FormLabel.vue'
-// @ts-ignore
 import FormWrapper from '@/components/FormWrapper/FormWrapper.vue'
 import { AccountsModel } from '@/core/database/entities/AccountsModel'
 import { NotificationType } from '@/core/utils/NotificationType'
@@ -42,10 +40,11 @@ type NetworkNodeEntry = {value: NetworkType, label: string}
     ValidationProvider,
     ErrorTooltip,
     FormWrapper,
-    FormLabel,
+    FormRow,
   },
   computed: {...mapGetters({
     networkType: 'network/networkType',
+    generationHash: 'network/generationHash',
     currentAccount: 'account/currentAccount',
   })},
 })
@@ -130,7 +129,8 @@ export class FormAccountSettingTs extends Vue {
       ['password', passwordHash],
       ['hint', this.formItems.hint],
       ['networkType', this.networkType],
-      ['seed', '']
+      ['seed', ''],
+      ['generationHash', this.generationHash]
     ]))
 
     // use repository for storage

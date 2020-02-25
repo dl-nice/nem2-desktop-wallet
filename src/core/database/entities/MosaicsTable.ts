@@ -34,7 +34,7 @@ export class MosaicsTable extends DatabaseTable {
       'generationHash',
       'isCurrencyMosaic',
       'isHarvestMosaic',
-    ], 2) // version=2
+    ], 4) // version=4
   }
 
   /**
@@ -55,7 +55,9 @@ export class MosaicsTable extends DatabaseTable {
     callback: (rows: Map<string, MosaicsModel>) => Map<string, MosaicsModel>
   }[] {
     return [
-      {version: 2, callback: MosaicsMigrations.version2_addGenHash}
+      {version: 2, callback: MosaicsMigrations.version2_addGenHash},
+      {version: 3, callback: MosaicsMigrations.version3_newSymbol},
+      {version: 4, callback: MosaicsMigrations.version4_flagsAsNumber},
     ]
   }
 }

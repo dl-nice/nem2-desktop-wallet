@@ -16,6 +16,11 @@
         <WindowControls />
 
         <div class="app_controller clear">
+          <div @click="hasDebugConsoleModal = true" class="debug-console-trigger">
+            <Icon :type="'ios-code-working'" size="18" />
+            <span>Debug</span>
+          </div>
+
           <PeerSelector />
           <LanguageSelector />
           <WalletSelectorField @input="onChangeWallet" />
@@ -27,6 +32,13 @@
         <router-view />
       </div>
     </transition>
+
+    <ModalDebugConsole
+      v-if="hasDebugConsoleModal"
+      :visible="hasDebugConsoleModal"
+      :title="$t('modal_title_debug_console')"
+      @close="hasDebugConsoleModal = false"
+    />
   </div>
 </template>
 

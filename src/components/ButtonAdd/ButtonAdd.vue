@@ -1,15 +1,14 @@
 <template>
-  <div v-if="!disabled" class="add_mosaic_button radius" @click="$emit('click')">
-    <slot name="label"></slot>
-  </div>
-  <div v-else class="add_mosaic_button radius" disabled="disabled">
-    <slot name="label"></slot>
+  <div v-if="!disabled" class="round-button" @click="$emit('click')">
+    <Icon type="md-add-circle" />
   </div>
 </template>
 
 <script lang="ts">
-import {ButtonAddTs} from './ButtonAddTs'
-import './ButtonAdd.less'
+import {Component, Vue, Prop} from 'vue-property-decorator'
 
-export default class ButtonAdd extends ButtonAddTs {}
+@Component
+export default class ButtonAdd extends Vue {
+  @Prop({ default: false }) disabled: boolean
+}
 </script>

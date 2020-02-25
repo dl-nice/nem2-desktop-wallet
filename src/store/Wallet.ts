@@ -24,10 +24,14 @@ import {
   TransactionService,
   AggregateTransaction,
   Order,
-  TransactionAnnounceResponse,
+  AccountInfo,
+  PublicAccount,
+  Account,
+  NetworkType,
+  MultisigAccountInfo,
 } from 'nem2-sdk'
 import {Subscription, Observable, from} from 'rxjs'
-import {map, catchError, mergeMap, flatMap, tap} from 'rxjs/operators'
+import {map} from 'rxjs/operators'
 
 // internal dependencies
 import {$eventBus} from '../events'
@@ -57,6 +61,71 @@ const transactionGroupToStateVariable = (
   }
 
   return transactionGroup
+}
+
+/**
+ * Create an sdk address object by payload
+ * @param payload
+ */
+const getAddressByPayload = (
+  payload: WalletsModel | Account | PublicAccount | Address | {networkType: NetworkType, publicKey?: string, name?: string}
+): Address => {
+  if (payload instanceof WalletsModel) {
+    return Address.createFromRawAddress(payload.values.get('address'))
+  }
+  else if (payload instanceof PublicAccount
+        || payload instanceof Account) {
+    return payload.address
+  }
+  else if (payload instanceof Address) {
+    return payload
+  }
+
+  // - finally from payload
+  const publicAccount = PublicAccount.createFromPublicKey(
+    payload.publicKey,
+    payload.networkType
+  )
+  return publicAccount.address
+}
+
+/**
+ * Create a wallet entity by payload
+ * @param payload
+ */
+const getWalletByPayload = (
+  payload: WalletsModel | Account | PublicAccount | Address | {networkType: NetworkType, publicKey?: string, name?: string}
+): WalletsModel => {
+  if (payload instanceof WalletsModel) {
+    return payload
+  }
+  else if (payload instanceof Address) {
+    return new WalletsModel(new Map<string, any>([
+      ['name', payload.pretty()],
+      ['address', payload.plain()],
+      ['publicKey', payload.plain()],
+      ['isMultisig', true],
+    ]))
+  }
+  else if (payload instanceof PublicAccount || payload instanceof Account) {
+    return new WalletsModel(new Map<string, any>([
+      ['name', payload.address.pretty()],
+      ['address', payload.address.plain()],
+      ['publicKey', payload.publicKey],
+      ['isMultisig', true],
+    ]))
+  }
+  else if (payload && payload.networkType && payload.publicKey) {
+    const publicAccount = PublicAccount.createFromPublicKey(payload.publicKey, payload.networkType)
+    const walletName = payload.name && payload.name.length ? payload.name : publicAccount.address.pretty()
+    return new WalletsModel(new Map<string, any>([
+      ['name', walletName],
+      ['address', publicAccount.address.plain()],
+      ['publicKey', publicAccount.publicKey],
+      ['isMultisig', true],
+    ]))
+  }
+  else return undefined
 }
 
 /// region globals
@@ -95,6 +164,13 @@ export default {
     currentMultisigInfo: null,
     currentWalletOwnedMosaics: [],
     currentWalletOwnedNamespaces: [],
+    isCosignatoryMode: false,
+    currentSigner: null,
+    currentSignerInfo: {},
+    currentSignerAddress: null,
+    currentSignerMosaics: [],
+    currentSignerOwnedMosaics: [],
+    currentSignerOwnedNamespaces: [],
     knownWallets: [],
     otherWalletsInfo: {},
     otherMultisigsInfo: {},
@@ -103,6 +179,10 @@ export default {
     confirmedTransactions: [],
     unconfirmedTransactions: [],
     partialTransactions: [],
+    stageOptions: {
+      isAggregate: false,
+      isMultisig: false,
+    },
     stagedTransactions: [],
     signedTransactions: [],
     transactionCache: {},
@@ -111,13 +191,33 @@ export default {
   },
   getters: {
     getInitialized: state => state.initialized,
-    currentWallet: state => state.currentWallet,
+    currentWallet: state => {
+      // - in case of a WalletsModel, the currentWallet instance is simply returned
+      // - in case of Address/Account or other, a fake model will be created
+      return getWalletByPayload(state.currentWallet)
+    },
+    currentSigner: state => {
+      // - in case of a WalletsModel, the currentWallet instance is simply returned
+      // - in case of Address/Account or other, a fake model will be created
+      return getWalletByPayload(state.currentSigner)
+    },
     currentWalletAddress: state => state.currentWalletAddress,
     currentWalletInfo: state => state.currentWalletInfo,
     currentWalletMosaics: state => state.currentWalletMosaics,
     currentWalletOwnedMosaics: state => state.currentWalletOwnedMosaics,
     currentWalletOwnedNamespaces: state => state.currentWalletOwnedNamespaces,
     currentMultisigInfo: state => state.currentMultisigInfo,
+    isCosignatoryMode: state => state.isCosignatoryMode,
+    currentSignerInfo: state => state.currentSignerInfo,
+    currentSignerMultisigInfo: state => {
+      const plainAddress = state.currentSignerAddress ? state.currentSignerAddress.plain() : null
+      if(!plainAddress) return null
+      return state.otherMultisigsInfo[plainAddress] || null
+    } ,
+    currentSignerAddress: state => state.currentSignerAddress,
+    currentSignerMosaics: state => state.currentSignerMosaics,
+    currentSignerOwnedMosaics: state => state.currentSignerOwnedMosaics,
+    currentSignerOwnedNamespaces: state => state.currentSignerOwnedNamespaces,
     knownWallets: state => state.knownWallets,
     otherWalletsInfo: state => state.otherWalletsInfo,
     otherMultisigsInfo: state => state.otherMultisigsInfo,
@@ -152,6 +252,7 @@ export default {
         return t1.transactionInfo.index - t2.transactionInfo.index
       })
     },
+    stageOptions: state => state.stageOptions,
     stagedTransactions: state => state.stagedTransactions,
     signedTransactions: state => state.signedTransactions,
     transactionCache: state => state.transactionCache,
@@ -165,12 +266,19 @@ export default {
   },
   mutations: {
     setInitialized: (state, initialized) => { state.initialized = initialized },
-    currentWallet: (state, walletName) => Vue.set(state, 'currentWallet', walletName),
+    currentWallet: (state, walletModel) => Vue.set(state, 'currentWallet', walletModel),
+    isCosignatoryMode: (state, mode) => Vue.set(state, 'isCosignatoryMode', mode),
     currentWalletAddress: (state, walletAddress) => Vue.set(state, 'currentWalletAddress', walletAddress),
     currentWalletInfo: (state, currentWalletInfo) => Vue.set(state, 'currentWalletInfo', currentWalletInfo),
     currentWalletMosaics: (state, currentWalletMosaics) => Vue.set(state, 'currentWalletMosaics', currentWalletMosaics),
     currentWalletOwnedMosaics: (state, currentWalletOwnedMosaics) => Vue.set(state, 'currentWalletOwnedMosaics', currentWalletOwnedMosaics),
     currentWalletOwnedNamespaces: (state, currentWalletOwnedNamespaces) => Vue.set(state, 'currentWalletOwnedNamespaces', currentWalletOwnedNamespaces),
+    currentSigner: (state, signerPayload) => Vue.set(state, 'currentSigner', signerPayload),
+    currentSignerInfo: (state, currentSignerInfo) => Vue.set(state, 'currentSignerInfo', currentSignerInfo),
+    currentSignerAddress: (state, signerAddress) => Vue.set(state, 'currentSignerAddress', signerAddress),
+    currentSignerMosaics: (state, currentSignerMosaics) => Vue.set(state, 'currentSignerMosaics', currentSignerMosaics),
+    currentSignerOwnedMosaics: (state, currentSignerOwnedMosaics) => Vue.set(state, 'currentSignerOwnedMosaics', currentSignerOwnedMosaics),
+    currentSignerOwnedNamespaces: (state, currentSignerOwnedNamespaces) => Vue.set(state, 'currentSignerOwnedNamespaces', currentSignerOwnedNamespaces),
     setKnownWallets: (state, wallets) => Vue.set(state, 'knownWallets', wallets),
     addWalletInfo: (state, walletInfo) => {
       // update storage
@@ -180,13 +288,15 @@ export default {
       // update state
       Vue.set(state, 'otherWalletsInfo', wallets)
     },
-    addOtherMultisigInfo: (state, multisigInfo) => {
+    addOtherMultisigInfo: (state, multisigInfo: MultisigAccountInfo) => {
+      const address = multisigInfo.account.address.plain()
+
       // update storage
-      let wallets = state.otherMultisigsInfo
-      wallets[multisigInfo.address.plain()] = multisigInfo
+      let othersInfo = state.otherMultisigsInfo
+      othersInfo[address] = multisigInfo
 
       // update state
-      Vue.set(state, 'otherMultisigsInfo', wallets)
+      Vue.set(state, 'otherMultisigsInfo', othersInfo)
     },
     setMultisigInfo: (state, multisigInfo) => Vue.set(state, 'currentMultisigInfo', multisigInfo),
     transactionHashes: (state, hashes) => Vue.set(state, 'transactionHashes', hashes),
@@ -195,12 +305,14 @@ export default {
     partialTransactions: (state, transactions) => Vue.set(state, 'partialTransactions', transactions),
     setSubscriptions: (state, data) => Vue.set(state, 'subscriptions', data),
     addSubscriptions: (state, payload) => {
-      if (payload && payload.length) {
-        const subscriptions = state.subscriptions
-        subscriptions.push(payload)
+      const subscriptions = state.subscriptions
 
-        Vue.set(state, 'subscriptions', subscriptions)
+      if (!subscriptions.hasOwnProperty(payload.address)) {
+        subscriptions[payload.address] = []
       }
+
+      subscriptions[payload.address].push(payload.subscriptions)
+      Vue.set(state, 'subscriptions', subscriptions)
     },
     addTransactionToCache: (state, payload) => {
       if (payload === undefined) {
@@ -222,6 +334,7 @@ export default {
       Vue.set(state, 'transactionCache', cache)
       return cache
     },
+    stageOptions: (state, options) => Vue.set(state, 'stageOptions', options),
     setStagedTransactions: (state, transactions: Transaction[]) => Vue.set(state, 'stagedTransactions', transactions),
     addStagedTransaction: (state, transaction: Transaction) => {
       // - get previously staged transactions
@@ -262,23 +375,22 @@ export default {
     },
   },
   actions: {
-    async initialize({ commit, dispatch, getters }, address) {
+    /**
+     * Possible `options` values include: 
+     * @type {
+     *    skipTransactions: boolean,
+     *    skipOwnedAssets: boolean,
+     *    skipMultisig: boolean,
+     * }
+     */
+    async initialize({ commit, dispatch, getters }, {address, options}) {
       const callback = async () => {
         if (!address || !address.length) {
             return ;
         }
 
         // fetch account info
-        try { await dispatch('REST_FETCH_INFO', address) } catch (e) {}
-        try { await dispatch('REST_FETCH_TRANSACTIONS', {
-          group: 'confirmed',
-          pageSize: 100,
-          address: address,
-        }) } catch(e) {}
-
-        // must be non-blocking
-        try { dispatch('REST_FETCH_OWNED_MOSAICS', address) } catch (e) {}
-        try { dispatch('REST_FETCH_OWNED_NAMESPACES', address) } catch (e) {}
+        await dispatch('REST_FETCH_WALLET_DETAILS', {address, options})
 
         // open websocket connections
         dispatch('SUBSCRIBE', address)
@@ -286,41 +398,111 @@ export default {
       }
       await Lock.initialize(callback, {commit, dispatch, getters})
     },
-    async uninitialize({ commit, dispatch, getters }) {
+    async uninitialize({ commit, dispatch, getters }, {address, which}) {
       const callback = async () => {
         // close websocket connections
-        await dispatch('UNSUBSCRIBE')
-        await dispatch('RESET_BALANCES')
+        await dispatch('UNSUBSCRIBE', address)
+        await dispatch('RESET_BALANCES', which)
         await dispatch('RESET_TRANSACTIONS')
         commit('setInitialized', false)
       }
       await Lock.uninitialize(callback, {commit, dispatch, getters})
     },
 /// region scoped actions
-    async SET_CURRENT_WALLET({commit, dispatch}, currentWalletModel) {
-      // fetchDatabase()
+    async REST_FETCH_WALLET_DETAILS({dispatch}, {address, options}) {
+      try { await dispatch('REST_FETCH_INFO', address) } catch (e) {}
 
-      // const currentWallet = walletsRepository.read(walletId)
-      commit('currentWallet', currentWalletModel)
+      if (!options || !options.skipTransactions) {
+        try { await dispatch('REST_FETCH_TRANSACTIONS', {
+          group: 'confirmed',
+          pageSize: 100,
+          address: address,
+        }) } catch(e) {}
+      }
 
-      const address = Address.createFromRawAddress(currentWalletModel.values.get('address'))
+      // must be non-blocking
+      if (!options || !options.skipOwnedAssets) {
+        try { dispatch('REST_FETCH_OWNED_MOSAICS', address) } catch (e) {}
+        try { dispatch('REST_FETCH_OWNED_NAMESPACES', address) } catch (e) {}
+      }
+
+      if (!options || !options.skipMultisig) {
+        try { dispatch('REST_FETCH_MULTISIG', address) } catch (e) {}
+      }
+    },
+    /**
+     * Possible `options` values include: 
+     * @type {
+      *    isCosignatoryMode: boolean,
+      * }
+      */
+    async SET_CURRENT_WALLET({commit, dispatch, getters}, {model, options}) {
+
+      const previous = getters.currentWallet
+
+      let address: Address = getAddressByPayload(model)
+      dispatch('diagnostic/ADD_DEBUG', 'Store action wallet/SET_CURRENT_WALLET dispatched with ' + address.plain(), {root: true})
+
+      // set current wallet
+      commit('currentWallet', model)
       commit('currentWalletAddress', address)
 
-      dispatch('diagnostic/ADD_DEBUG', 'Changing current wallet to ' + address.plain(), {root: true})
+      // reset current signer
+      dispatch('SET_CURRENT_SIGNER', {model, options: {skipDetails: true}})
 
-      // reset store + re-initialize
-      await dispatch('uninitialize')
-      await dispatch('initialize', address.plain())
+      if (!!previous) {
+        // in normal initialize routine, old active wallet
+        // connections must be closed
+        await dispatch('uninitialize', {address: previous.values.get('address'), which: 'currentWalletMosaics'})
+      }
+
+      await dispatch('initialize', {address: address.plain(), options: {}})
       $eventBus.$emit('onWalletChange', address.plain())
     },
-    SET_KNOWN_WALLETS({commit}, wallets) {
+    async SET_CURRENT_SIGNER({commit, dispatch, getters}, {model, options}) {
+      let address: Address = getAddressByPayload(model)
+      dispatch('diagnostic/ADD_DEBUG', 'Store action wallet/SET_CURRENT_SIGNER dispatched with ' + address.plain(), {root: true})
+
+      let payload = model
+      if (model instanceof WalletsModel) {
+        payload = {
+          networkType: address.networkType,
+          publicKey: model.values.get('publicKey'),
+        }
+      }
+      
+      // set current signer
+      commit('currentSigner', payload)
+      commit('currentSignerAddress', address)
+
+      // whether entering in cosignatory mode
+      const currentWallet = getters['currentWallet']
+      let isCosignatory = false
+      if (address.plain() !== currentWallet.values.get('address')) {
+        isCosignatory = true
+      }
+
+      commit('isCosignatoryMode', isCosignatory)
+
+      // setting current signer should not fetch ALL data
+      let detailOpts = {
+        skipTransactions: true,
+        skipMultisig: true,
+        skipOwnedAssets: false,
+      }
+
+      if (!options || !options.skipDetails) {
+        await dispatch('REST_FETCH_WALLET_DETAILS', {address: address.plain(), options: detailOpts})
+      }
+    },
+    SET_KNOWN_WALLETS({commit}, wallets: string[]) {
       commit('setKnownWallets', wallets)
     },
-    RESET_BALANCES({dispatch}) {
-      dispatch('SET_BALANCES', [])
+    RESET_BALANCES({dispatch}, which) {
+      dispatch('SET_BALANCES', {which, mosaics: []})
     },
-    SET_BALANCES({commit}, mosaics) {
-      commit('currentWalletMosaics', mosaics.length ? mosaics : [])
+    SET_BALANCES({commit}, {mosaics, which}) {
+      commit(which, mosaics.length ? mosaics : [])
     },
     RESET_SUBSCRIPTIONS({commit}) {
       commit('setSubscriptions', [])
@@ -376,12 +558,11 @@ export default {
       const transactions = getters[transactionGroup]
 
       // prepare search
-      const transaction = transactionMessage.transaction
-      const transactionHash = transaction.meta.hash
+      const transactionHash = transactionMessage.transaction
 
       // find transaction in storage
       const findHashIt = hashes.find(hash => hash === transactionHash)
-      const findIterator = transactions.find(tx => tx.meta.hash === transactionHash)
+      const findIterator = transactions.find(tx => tx.transactionInfo.hash === transactionHash)
       if (findIterator === undefined) {
         return ; // not found, do nothing
       }
@@ -416,22 +597,26 @@ export default {
       )
 
       // update state of listeners & subscriptions
-      commit('addSubscriptions', subscriptions)
+      commit('addSubscriptions', {address, subscriptions})
     },
 
     // Unsubscribe from all open websocket connections
-    UNSUBSCRIBE({ dispatch, getters }) {
+    async UNSUBSCRIBE({ dispatch, getters }, address) {
       const subscriptions = getters.getSubscriptions
-      subscriptions.map((subscription: SubscriptionType) => {
-        // unsubscribe channels
-        subscription.subscriptions.map(sub => sub.unsubscribe())
+      const subsByAddress = subscriptions.hasOwnProperty(address) ? subscriptions[address] : []
+      for (let i = 0, m = subsByAddress.length; i < m; i++) {
+        const subscription = subsByAddress[i]
 
-        // close listener
-        subscription.listener.close()
-      })
+        // subscribers
+        for (let j = 0, n = subscription.subscriptions; j < n; j++) {
+          await subscription.subscriptions[j].unsubscribe()
+        }
+
+        await subscription.listener.close()
+      }
 
       // update state
-      dispatch('RESET_SUBSCRIPTIONS')
+      dispatch('RESET_SUBSCRIPTIONS', address)
     },
 /**
  * REST API
@@ -450,7 +635,7 @@ export default {
       try {
         // prepare REST parameters
         const currentPeer = rootGetters['network/currentPeer'].url
-        const queryParams = new QueryParams(pageSize, id)
+        const queryParams = new QueryParams().setPageSize(pageSize).setId(id)
         const addressObject = Address.createFromRawAddress(address)
 
         // fetch transactions from REST gateway
@@ -509,81 +694,110 @@ export default {
 
       dispatch('diagnostic/ADD_DEBUG', 'Store action wallet/REST_FETCH_INFO dispatched with : ' + JSON.stringify({address: address}), {root: true})
 
+      const currentWallet = getters.currentWallet
+      const currentSigner = getters.currentSigner
+      const currentPeer = rootGetters['network/currentPeer'].url
+
       try {
         // prepare REST parameters
-        const currentPeer = rootGetters['network/currentPeer'].url
         const addressObject = Address.createFromRawAddress(address)
 
         // fetch account info from REST gateway
         const accountHttp = RESTService.create('AccountHttp', currentPeer)
+        const accountInfo = await accountHttp.getAccountInfo(addressObject).toPromise()
+        commit('addWalletInfo', accountInfo)
 
-        return accountHttp.getAccountInfo(addressObject).subscribe((accountInfo) => {
+        // update current wallet state if necessary
+        if (currentWallet && address === getters.currentWalletAddress.plain()) {
+          commit('currentWalletInfo', accountInfo)
+          dispatch('SET_BALANCES', {mosaics: accountInfo.mosaics, which: 'currentWalletMosaics'})
+        }
+        // update current signer state if not current wallet
+        else if (currentSigner && address === getters.currentSignerAddress.plain()) {
+          commit('currentSignerInfo', accountInfo)
+          dispatch('SET_BALANCES', {mosaics: accountInfo.mosaics, which: 'currentSignerMosaics'})
+        }
 
-          commit('addWalletInfo', accountInfo)
-
-          // update current wallet state if necessary
-          if (address === getters.currentWalletAddress.plain()) {
-            commit('currentWalletInfo', accountInfo)
-            dispatch('SET_BALANCES', accountInfo.mosaics)
-          }
-
-          return accountInfo
-        }, () => {
-          dispatch('SET_BALANCES', [])
-        })
+        return accountInfo
       }
       catch (e) {
+        if (!!currentWallet && address === getters.currentWalletAddress.plain()) {
+          commit('currentWalletInfo', null)
+          dispatch('SET_BALANCES', {mosaics: [], which: 'currentWalletMosaics'})
+        }
+        else if (!!getters.currentSigner && address === getters.currentSignerAddress.plain()) {
+          commit('currentSignerInfo', null)
+          dispatch('SET_BALANCES', {mosaics: [], which: 'currentSignerMosaics'})
+        }
+
         dispatch('diagnostic/ADD_ERROR', 'An error happened while trying to fetch account information: ' + e, {root: true})
         return false
       }
     },
-    async REST_FETCH_INFOS({commit, dispatch, getters, rootGetters}, addresses) {
+    async REST_FETCH_INFOS({commit, dispatch, getters, rootGetters}, addresses): Promise<AccountInfo[]> {
 
-      dispatch('diagnostic/ADD_DEBUG', 'Store action wallet/REST_FETCH_INFOS dispatched with : ' + JSON.stringify(addresses.map(a => a.plain())), {root: true})
+      dispatch(
+        'diagnostic/ADD_DEBUG',
+        `Store action wallet/REST_FETCH_INFOS dispatched with : ${JSON.stringify(addresses.map(a => a.plain()))}`,
+        {root: true},
+      )
+
+      // read store
+      const currentPeer = rootGetters['network/currentPeer'].url
+      const currentWallet = getters['currentWallet']
 
       try {
-        // prepare REST parameters
-        const currentPeer = rootGetters['network/currentPeer'].url
-
         // fetch account info from REST gateway
         const accountHttp = RESTService.create('AccountHttp', currentPeer)
+        const accountsInfo = await accountHttp.getAccountsInfo(addresses).toPromise()
+        
+        // add accounts to the store
+        accountsInfo.forEach(info => commit('addWalletInfo', info))
 
-        return accountHttp.getAccountsInfo(addresses).subscribe((accountsInfo) => {
-          accountsInfo.map(info => commit('addWalletInfo', info))
+        // set current wallet info
+        const currentWalletInfo = accountsInfo.find(
+          info => info.address.equals(getters.currentWalletAddress),
+        )
+        if (currentWalletInfo !== undefined) {
+          commit('currentWalletInfo', currentWalletInfo)
+          dispatch('SET_BALANCES', {mosaics: currentWalletInfo.mosaics, which: 'currentWalletMosaics'})
+        }
 
-          const currentWalletInfo = accountsInfo.find(info => info.address.equals(getters.currentWalletAddress))
-          if (currentWalletInfo !== undefined) {
-            commit('currentWalletInfo', currentWalletInfo)
-            dispatch('SET_BALANCES', currentWalletInfo.mosaics)
-          }
+        // .. or set current signer info
+        const currentSignerInfo = accountsInfo.find(
+          info => info.address.equals(getters.currentSignerAddress),
+        )
+        if (currentSignerInfo !== undefined) {
+          commit('currentSignerInfo', currentWalletInfo)
+          dispatch('SET_BALANCES', {mosaics: currentWalletInfo.mosaics, which: 'currentSignerMosaics'})
+        }
 
-          return accountsInfo
-        }, (error) => dispatch('diagnostic/ADD_ERROR', 'An error happened while trying to fetch account informations: ' + error, {root: true}))
+        // return accounts info
+        return accountsInfo
       }
       catch (e) {
-        dispatch('diagnostic/ADD_ERROR', 'An error happened while trying to fetch account informations: ' + e, {root: true})
-        return false
+        dispatch('diagnostic/ADD_ERROR', `An error happened while trying to fetch accounts information: ${e}`, {root: true})
+        throw new Error(e)
       }
     },
     async REST_FETCH_MULTISIG({commit, dispatch, getters, rootGetters}, address) {
-      if (address instanceof WalletsModel) {
-        address = address.objects.address.plain()
-      }
-
       if (!address || address.length !== 40) {
         return ;
       }
 
       dispatch('diagnostic/ADD_DEBUG', 'Store action wallet/REST_FETCH_MULTISIG dispatched with : ' + address, {root: true})
 
+      // read store
+      const currentPeer = rootGetters['network/currentPeer'].url
+      const networkType = rootGetters['network/networkType']
+      const currentWallet = getters['currentWallet']
+
       try {
         // prepare REST parameters
-        const currentPeer = rootGetters['network/currentPeer'].url
-        const currentWallet = getters['currentWallet']
         const addressObject = Address.createFromRawAddress(address)
 
         // fetch account info from REST gateway
-        const multisigHttp = RESTService.create('MultisigHttp', currentPeer)
+        const multisigHttp = RESTService.create('MultisigHttp', currentPeer, networkType)
         const multisigInfo = await multisigHttp.getMultisigAccountInfo(addressObject).toPromise()
 
         // store multisig info
@@ -595,111 +809,148 @@ export default {
         return multisigInfo
       }
       catch (e) {
+        if (currentWallet && currentWallet.values.get('address') === address) {
+          commit('setMultisigInfo', null)
+        }
+
         dispatch('diagnostic/ADD_ERROR', 'An error happened while trying to fetch multisig information: ' + e, {root: true})
         return false
       }
     },
     async REST_FETCH_OWNED_MOSAICS({commit, dispatch, getters, rootGetters}, address) {
-      if (address instanceof WalletsModel) {
-        address = address.objects.address.plain()
-      }
-
       if (!address || address.length !== 40) {
         return ;
       }
 
       dispatch('diagnostic/ADD_DEBUG', 'Store action wallet/REST_FETCH_OWNED_MOSAICS dispatched with : ' + address, {root: true})
 
+      // read store
+      const currentPeer = rootGetters['network/currentPeer'].url
+      const currentWallet = getters['currentWallet']
+      const currentSigner = getters['currentSigner']
+      const networkType = rootGetters['network/networkType']
+
       try {
         // prepare REST parameters
-        const currentPeer = rootGetters['network/currentPeer'].url
-        const currentWallet = getters['currentWallet']
         const addressObject = Address.createFromRawAddress(address)
 
         // fetch account info from REST gateway
-        const mosaicHttp = RESTService.create('MosaicHttp', currentPeer)
+        const mosaicHttp = RESTService.create('MosaicHttp', currentPeer, networkType)
         const ownedMosaics = await mosaicHttp.getMosaicsFromAccount(addressObject).toPromise()
 
         // store multisig info
-        if (currentWallet && currentWallet.values.get('address') === address) {
+        if (currentWallet && address === currentWallet.values.get('address')) {
           commit('currentWalletOwnedMosaics', ownedMosaics)
+        }
+        else if (currentSigner && address === getters.currentSignerAddress.plain()) {
+          commit('currentSignerOwnedMosaics', ownedMosaics)
         }
 
         return ownedMosaics
       }
       catch (e) {
+        if (currentWallet && currentWallet.values.get('address') === address) {
+          commit('currentWalletOwnedMosaics', [])
+        }
+        else if (currentSigner && address === getters.currentSignerAddress.plain()) {
+          commit('currentSignerOwnedMosaics', [])
+        }
+
         dispatch('diagnostic/ADD_ERROR', 'An error happened while trying to fetch owned mosaics: ' + e, {root: true})
         return false
       }
     },
     async REST_FETCH_OWNED_NAMESPACES({commit, dispatch, getters, rootGetters}, address): Promise<NamespaceInfo[]> {
-      if (address instanceof WalletsModel) {
-        address = address.objects.address.plain()
-      }
-
       if (!address || address.length !== 40) {
         return ;
       }
 
       dispatch('diagnostic/ADD_DEBUG', 'Store action wallet/REST_FETCH_OWNED_NAMESPACES dispatched with : ' + address, {root: true})
 
+      // read store
+      const currentPeer = rootGetters['network/currentPeer'].url
+      const currentWallet = getters['currentWallet']
+      const currentSigner = getters['currentSigner']
+      const networkType = rootGetters['network/networkType']
+
       try {
         // prepare REST parameters
-        const currentPeer = rootGetters['network/currentPeer'].url
-        const currentWallet = getters['currentWallet']
         const addressObject = Address.createFromRawAddress(address)
 
         // fetch account info from REST gateway
-        const namespaceHttp = RESTService.create('NamespaceHttp', currentPeer)
+        const namespaceHttp = RESTService.create('NamespaceHttp', currentPeer, networkType)
+
+        // @TODO: Handle more than 100 namespaces
         const ownedNamespaces = await namespaceHttp.getNamespacesFromAccount(
-          addressObject, { pageSize: 100, order: Order.ASC }, // @TODO: Handle more than 100 namespaces
+          addressObject, new QueryParams().setPageSize(100).setOrder(Order.ASC), 
         ).toPromise()
 
         // store multisig info
         if (currentWallet && currentWallet.values.get('address') === address) {
           commit('currentWalletOwnedNamespaces', ownedNamespaces)
         }
+        else if (currentSigner && address === getters.currentSignerAddress.plain()) {
+          commit('currentSignerOwnedNamespaces', ownedNamespaces)
+        }
 
         return ownedNamespaces
       }
       catch (e) {
+        if (currentWallet && currentWallet.values.get('address') === address) {
+          commit('currentWalletOwnedNamespaces', [])
+        }
+        else if (currentSigner && address === getters.currentSignerAddress.plain()) {
+          commit('currentSignerOwnedNamespaces', [])
+        }
+
         dispatch('diagnostic/ADD_ERROR', 'An error happened while trying to fetch owned namespaces: ' + e, {root: true})
         return null
       }
     },
-    REST_ANNOUNCE_PARTIAL(
-      {commit, rootGetters},
-      {signedLock, signedPartial}
-    ): Observable<BroadcastResult> {
+    async REST_ANNOUNCE_PARTIAL(
+      {commit, dispatch, rootGetters},
+      {issuer, signedLock, signedPartial}
+    ): Promise<BroadcastResult> {
+      if (!issuer || issuer.length !== 40) {
+        return ;
+      }
+
+      dispatch('diagnostic/ADD_DEBUG', 'Store action wallet/REST_ANNOUNCE_PARTIAL dispatched with: ' + JSON.stringify({
+        issuer: issuer,
+        signedLockHash: signedLock.hash,
+        signedPartialHash: signedPartial.hash,
+      }), {root: true})
+
       try {
-        // prepare REST parameters
+        // - prepare REST parameters
         const currentPeer = rootGetters['network/currentPeer'].url
         const wsEndpoint = rootGetters['network/wsEndpoint']
         const transactionHttp = RESTService.create('TransactionHttp', currentPeer)
-        const receiptHttp = RESTService.create('ReceiptHttp', currentPeer)
-        const listener = new Listener(wsEndpoint)
 
-        // prepare nem2-sdk TransactionService
-        const service = new TransactionService(transactionHttp, receiptHttp)
+        // - prepare scoped *confirmation listener*
+        const listener = new Listener(wsEndpoint, WebSocket)
+        await listener.open()
 
-        // announce lock and aggregate only after lock confirmation
-        return service.announceHashLockAggregateBonded(
-          signedLock,
-          signedPartial,
-          listener
-        ).pipe(
-          map((announcedTransaction: AggregateTransaction) => {
-            commit('removeSignedTransaction', signedPartial)
-            commit('removeSignedTransaction', signedLock)
+        // - announce hash lock transaction and await confirmation
+        transactionHttp.announce(signedLock)
 
-            return new BroadcastResult(signedPartial, true)
-          })
-        )
+        // - listen for hash lock confirmation
+        return new Promise((resolve, reject) => {
+          const address = Address.createFromRawAddress(issuer)
+          return listener.confirmed(address, signedLock.hash).subscribe(
+            async (success) => {
+              // - hash lock confirmed, now announce partial
+              const response = await transactionHttp.announceAggregateBonded(signedPartial)
+              commit('removeSignedTransaction', signedLock)
+              commit('removeSignedTransaction', signedPartial)
+              return resolve(new BroadcastResult(signedPartial, true))
+            },
+            (error) => reject(new BroadcastResult(signedPartial, false))
+          )
+        })
       }
       catch(e) {
-        return from([
-          new BroadcastResult(signedPartial, false, e.toString()),
-        ])
+        return new BroadcastResult(signedPartial, false, e.toString())
       }
     },
     async REST_ANNOUNCE_TRANSACTION(
@@ -715,7 +966,6 @@ export default {
       try {
         // prepare REST parameters
         const currentPeer = rootGetters['network/currentPeer'].url
-        const wsEndpoint = rootGetters['network/wsEndpoint']
         const transactionHttp = RESTService.create('TransactionHttp', currentPeer)
 
         // prepare nem2-sdk TransactionService

@@ -2,7 +2,12 @@
   <div>
     <div class="verify-mnemonic-page-wrapper">
       <div class="verify-mnemonic-container">
-        <MnemonicVerification :words="mnemonicWords" />
+        <!--<MnemonicVerification :words="mnemonicWords" />-->
+        <MnemonicVerification
+          :words="mnemonicWords"
+          @success="$router.push({name: 'accounts.createAccount.finalize'})"
+          @canceled="$router.back()"
+        />
       </div>
       <div class="right-tip-container">
         <RightTipDisplay 

@@ -11,9 +11,8 @@
               <div class="value">
                 <div class="full-width-item-container">
                   <p
-                    class="input-size">
-                    C6DAFB1CDDF22089C76E7130DB7B2919B9AD3AEF1CEEE44C2ABCF1252B4458D6
-                  </p>
+                    class="input-size hash"
+                  >C6DAFB1CDDF22089C76E7130DB7B2919B9AD3AEF1CEEE44C2ABCF1252B4458D6</p>
                 </div>
               </div>
             </div>
@@ -37,7 +36,7 @@
                         v-focus
                         class="full-width-item-container input-size input-style"
                         :placeholder="$t('account_name')"
-                      >
+                      />
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -65,7 +64,7 @@
                         class="full-width-item-container input-size input-style"
                         :placeholder="$t('please_enter_your_wallet_password')"
                         type="password"
-                      >
+                      />
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -92,7 +91,7 @@
                         data-vv-name="confirmPassword"
                         :placeholder="$t('please_enter_your_new_password_again')"
                         type="password"
-                      >
+                      />
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -116,7 +115,7 @@
                       <input
                         v-model="formItems.hint"
                         class="full-width-item-container input-size input-style"
-                      >
+                      />
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -130,20 +129,8 @@
 </template>
 
 <script lang="ts">
-import {FormAccountSettingTs} from './FormAccountSettingTs'
+import { FormAccountSettingTs } from "./FormAccountSettingTs";
+import './FormAccountSetting.less'
 export default class FormAccountSetting extends FormAccountSettingTs {}
 </script>
 
-<style lang="less" scoped>
-@import "../../../views/resources/css/variables.less";
-.form-account-setting{
-  .title{
-      font-size: 24px;
-      color: #999999;
-      margin-bottom: 18px;
-  }
-  .form-value{
-    margin-left: 100px;
-  }
-}
-</style>

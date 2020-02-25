@@ -45,7 +45,7 @@ type NetworkNodeEntry = {value: NetworkType, label: string}
     FormLabel,
   },
   computed: {...mapGetters({
-    networkType: 'network/networkType',
+    generationHash: 'network/generationHash',
     currentAccount: 'account/currentAccount',
   })},
 })
@@ -57,18 +57,12 @@ export class FormAccountSettingTs extends Vue {
    */
   public currentAccount: AccountsModel
 
-  /**
+  /** 
    * Currently active network type
    * @see {Store.Network}
-   * @var {NetworkType}
+   * @var {string}
    */
-  public networkType: NetworkType
-
-  /**
-   * Accounts repository
-   * @var {AccountsRepository}
-   */
-  public accountsRepository = new AccountsRepository()
+  public generationHash: string
 
   /**
    * Validation rules
@@ -85,25 +79,24 @@ export class FormAccountSettingTs extends Vue {
     password: '',
     passwordAgain: '',
     hint: '',
-    networkType: NetworkType.TEST_NET,
   }
 
-  /**
-   * Network types
-   * @var {NetworkNodeEntry[]}
-   */
-  public networkTypeList: NetworkNodeEntry[] = [
-    {value: NetworkType.MIJIN_TEST, label: 'MIJIN_TEST'},
-    {value: NetworkType.MAIN_NET, label: 'MAIN_NET'},
-    {value: NetworkType.TEST_NET, label: 'TEST_NET'},
-    {value: NetworkType.MIJIN, label: 'MIJIN'},
-  ]
+  ///**
+  // * Network types
+  // * @var {NetworkNodeEntry[]}
+  // */
+  //public networkTypeList: NetworkNodeEntry[] = [
+  //  {value: NetworkType.MIJIN_TEST, label: 'MIJIN_TEST'},
+  //  {value: NetworkType.MAIN_NET, label: 'MAIN_NET'},
+  //  {value: NetworkType.TEST_NET, label: 'TEST_NET'},
+  //  {value: NetworkType.MIJIN, label: 'MIJIN'},
+  //]
 
-/// region computed properties getter/setter
+  /// region computed properties getter/setter
   get nextPage() {
     return this.$route.meta.nextPage
   }
-/// end-region computed properties getter/setter
+  /// end-region computed properties getter/setter
 
   /**
    * Submit action, validates form and creates account in storage
@@ -125,20 +118,15 @@ export class FormAccountSettingTs extends Vue {
     
     // - populate model
     const model = new AccountsModel(new Map<string, any>([
-      ['accountName', this.formItems.accountName],
-      ['wallets', []],
-      ['password', passwordHash],
-      ['hint', this.formItems.hint],
-      ['networkType', this.networkType],
-      ['seed', '']
+      [ 'accountName', this.formItems.accountName ],
+      [ 'wallets', [] ],
+      [ 'password', passwordHash ],
+      [ 'hint', this.formItems.hint ],
+      [ 'seed', '' ],
+      [ 'generationHash', this.generationHash ],
     ]))
-
-    // use repository for storage
-    this.accountsRepository.create(model.values)
-
-    // execute store actions
-    this.$store.dispatch('account/SET_CURRENT_ACCOUNT', model)
     this.$store.dispatch('temporary/SET_PASSWORD', this.formItems.password)
+    this.$store.dispatch('temporary/SET_ACCOUNT',model)
     this.$store.dispatch('notification/ADD_SUCCESS', NotificationType.OPERATION_SUCCESS)
 
     // flush and continue

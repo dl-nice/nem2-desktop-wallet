@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Component, Prop, Vue} from 'vue-property-decorator'
-import draggable from 'vuedraggable'
 // @ts-ignore
 import MnemonicTag from '@/components/MnemonicTag/MnemonicTag.vue'
-
 // internal dependencies
-import {NotificationType} from '@/core/utils/NotificationType'
+import { NotificationType } from '@/core/utils/NotificationType'
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import draggable from 'vuedraggable'
+
 
 /// region helpers
 /**
@@ -102,7 +102,6 @@ export class MnemonicVerificationTs extends Vue {
   public processVerification(): boolean {
     const origin = this.words.join(' ')
     const rebuilt = this.selectedWords.join(' ')
-
     // - origin words list does not match
     if (origin !== rebuilt) {
       const errorMsg = this.selectedWords.length < 1 ? 

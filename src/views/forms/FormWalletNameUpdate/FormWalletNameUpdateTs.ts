@@ -16,15 +16,10 @@
 import {Component, Vue} from 'vue-property-decorator'
 import {mapGetters} from 'vuex'
 import {NetworkType, Password, Account} from 'nem2-sdk'
-import { MnemonicPassPhrase } from 'nem2-hd-wallets'
 
 // internal dependencies
 import {ValidationRuleset} from '@/core/validation/ValidationRuleset'
-import {AccountsModel} from '@/core/database/entities/AccountsModel'
-import {WalletsModel, WalletType} from '@/core/database/entities/WalletsModel'
-import {DerivationPathLevels, DerivationService} from '@/services/DerivationService'
-import {AESEncryptionService} from '@/services/AESEncryptionService'
-import {AccountsRepository} from '@/repositories/AccountsRepository'
+import {WalletsModel} from '@/core/database/entities/WalletsModel'
 import {WalletsRepository} from '@/repositories/WalletsRepository'
 import {NotificationType} from '@/core/utils/NotificationType'
 import {WalletService} from '@/services/WalletService'
@@ -36,7 +31,7 @@ import ErrorTooltip from '@/components/ErrorTooltip/ErrorTooltip.vue'
 // @ts-ignore
 import FormWrapper from '@/components/FormWrapper/FormWrapper.vue'
 // @ts-ignore
-import FormLabel from '@/components/FormLabel/FormLabel.vue'
+import FormRow from '@/components/FormRow/FormRow.vue'
 // @ts-ignore
 import ModalFormAccountUnlock from '@/views/modals/ModalFormAccountUnlock/ModalFormAccountUnlock.vue'
 
@@ -46,7 +41,7 @@ import ModalFormAccountUnlock from '@/views/modals/ModalFormAccountUnlock/ModalF
     ValidationProvider,
     ErrorTooltip,
     FormWrapper,
-    FormLabel,
+    FormRow,
     ModalFormAccountUnlock,
   },
   computed: {...mapGetters({

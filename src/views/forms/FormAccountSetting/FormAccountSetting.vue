@@ -11,7 +11,8 @@
               <div class="value">
                 <div class="full-width-item-container">
                   <p
-                    class="input-size">
+                    class="input-size"
+                  >
                     C6DAFB1CDDF22089C76E7130DB7B2919B9AD3AEF1CEEE44C2ABCF1252B4458D6
                   </p>
                 </div>
@@ -37,7 +38,7 @@
                         v-focus
                         class="full-width-item-container input-size input-style"
                         :placeholder="$t('account_name')"
-                      >
+                      />
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -116,10 +117,28 @@
                       <input
                         v-model="formItems.hint"
                         class="full-width-item-container input-size input-style"
-                      >
+                      />
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
+              </div>
+            </div>
+            <div class="form-line-container form-row">
+              <div class="flex-container mt-3">
+                <button
+                  type="button"
+                  class="button-style back-button" 
+                  @click="$router.back()"
+                >
+                  上一步
+                </button>
+                <button
+                  type="submit"
+                  class="button-style validation-button" 
+                  @click="handleSubmit(submit)"
+                >
+                  下一步
+                </button>
               </div>
             </div>
           </form>
@@ -130,20 +149,8 @@
 </template>
 
 <script lang="ts">
-import {FormAccountSettingTs} from './FormAccountSettingTs'
+import { FormAccountSettingTs } from "./FormAccountSettingTs";
+import './FormAccountSetting.less'
 export default class FormAccountSetting extends FormAccountSettingTs {}
 </script>
 
-<style lang="less" scoped>
-@import "../../../views/resources/css/variables.less";
-.form-account-setting{
-  .title{
-      font-size: 24px;
-      color: #999999;
-      margin-bottom: 18px;
-  }
-  .form-value{
-    margin-left: 100px;
-  }
-}
-</style>

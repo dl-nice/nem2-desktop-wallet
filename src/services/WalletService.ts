@@ -18,7 +18,6 @@ import {Account, Address, NetworkType, SimpleWallet, Password} from 'nem2-sdk'
 import {
   ExtendedKey,
   MnemonicPassPhrase,
-  Network,
   NodeEd25519,
   Wallet,
 } from 'nem2-hd-wallets'
@@ -31,14 +30,6 @@ import {WalletsModel, WalletType} from '@/core/database/entities/WalletsModel'
 import {WalletsRepository} from '@/repositories/WalletsRepository'
 import {SimpleStorageAdapter} from '@/core/database/SimpleStorageAdapter'
 import {AccountsModel} from '@/core/database/entities/AccountsModel'
-
-const getNetworkFromNetworkType = (networkType: NetworkType): Network => {
-  if (undefined !== [NetworkType.MIJIN, NetworkType.MIJIN_TEST].find(type => networkType === type)) {
-      return Network.CATAPULT
-  }
-
-  return Network.CATAPULT_PUBLIC
-}
 
 export class WalletService extends AbstractService {
   /**
@@ -136,11 +127,11 @@ export class WalletService extends AbstractService {
     }
 
     // create hd extended key
-    const network = getNetworkFromNetworkType(networkType)
-    const extendedKey = ExtendedKey.createFromSeed(mnemonic.toSeed().toString('hex'), network)
+    const extendedKey = ExtendedKey.createFromSeed(mnemonic.toSeed().toString('hex'))
 
     // create wallet
     const wallet = new Wallet(extendedKey)
+    // @ts-ignore //@TODO: SDK upgrade
     return wallet.getChildAccount(path, networkType)
   }
 
@@ -156,7 +147,6 @@ export class WalletService extends AbstractService {
   ): ExtendedKey {
     return ExtendedKey.createFromSeed(
       mnemonic.toSeed().toString('hex'),
-      getNetworkFromNetworkType(networkType)
     )
   }
 
@@ -175,7 +165,6 @@ export class WalletService extends AbstractService {
       Buffer.from(account.privateKey),
       undefined, // publicKey
       Buffer.from(''), // chainCode
-      getNetworkFromNetworkType(networkType)
     )
     return new ExtendedKey(nodeEd25519, nodeEd25519.network)
   }
@@ -206,7 +195,27 @@ export class WalletService extends AbstractService {
     )
 
     const wallets = paths.map(path => new Wallet(xkey.derivePath(path)))
-    return wallets.map(wallet => wallet.getAccount(networkType))
+    // @ts-ignore // @TODO: SDK Upgrade
+    return wallets.map(wallet => wallet.getAccount())
+  }
+
+  /**
+   * Generate accounts using a mnemonic and an array of paths
+   * @param {MnemonicPassPhrase} mnemonic
+   * @param {NetworkType} networkType
+   * @param {string[]} paths
+   * @returns {Account[]}
+   */
+  public generateAccountsFromPaths(
+    mnemonic: MnemonicPassPhrase,
+    networkType: NetworkType,
+    paths: string[],
+  ): Account[] {
+    // create hd extended key
+    const xkey = this.getExtendedKeyFromMnemonic(mnemonic, networkType)
+    const wallets = paths.map(path => new Wallet(xkey.derivePath(path)))
+    // @ts-ignore
+    return wallets.map(wallet => wallet.getAccount())
   }
 
   /**
@@ -232,8 +241,13 @@ export class WalletService extends AbstractService {
     networkType: NetworkType
   ): string {
     const address = Address.createFromPublicKey(publicKey, networkType)
-    const known = this.$store.getters['wallet/knownWallets']
-    const findIt = known.find(wlt => publicKey === wlt.values.get('publicKey'))
+
+    // search in known wallets
+    const knownWallets = this.$store.getters['wallet/knownWallets']
+    const wallets = this.getWallets(wlt => knownWallets.includes(wlt.getIdentifier()))
+
+    // find by public key
+    const findIt = wallets.find(wlt => publicKey === wlt.values.get('publicKey'))
     if (undefined !== findIt) {
       return findIt.values.get('name')
     }

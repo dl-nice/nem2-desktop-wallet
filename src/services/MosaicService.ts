@@ -138,7 +138,7 @@ export class MosaicService extends AbstractService {
       const mosaic = repository.createModel(new Map<string, any>([
         ['hexId', mosaicId.toHex()],
         ['name', mosaicNames && mosaicNames.length ? mosaicNames.shift().name : ''],
-        ['flags', mosaicInfo.flags.toDTO()],
+        ['flags', mosaicInfo.flags.toDTO().flags],
         ['startHeight', mosaicInfo.height],
         ['duration', mosaicInfo.duration.compact()],
         ['divisibility', mosaicInfo.divisibility],
@@ -194,7 +194,7 @@ export class MosaicService extends AbstractService {
   public mapBalanceByAddress(
     accountsInfo: AccountInfo[],
     mosaic: MosaicId,
-  ): any {
+  ): Record<string, number> {
     return accountsInfo.map(({mosaics, address}) => {
       // - check balance
       const hasNetworkMosaic = mosaics.find(
@@ -211,7 +211,6 @@ export class MosaicService extends AbstractService {
         address: address.plain(),
         balance: this.getRelativeAmount(balance, mosaic),
       }
-    })
-    .reduce((acc, {address, balance}) => ({...acc, [address]: balance}), {})
+    }).reduce((acc, {address, balance}) => ({...acc, [address]: balance}), {})
   }
 }

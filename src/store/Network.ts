@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import Vue from 'vue';
-import {NetworkType, Listener, BlockInfo} from 'nem2-sdk';
+import {NetworkType, Listener, BlockInfo, UInt64} from 'nem2-sdk';
 import {Subscription} from 'rxjs'
 
 // internal dependencies
@@ -77,6 +77,7 @@ export default {
     explorerUrl: networkConfig.explorerUrl,
     networkType: NetworkType.MIJIN_TEST,
     generationHash: networkConfig.networks['testnet-publicTest'].generationHash,
+    properties: networkConfig.networks['testnet-publicTest'].properties,
     isConnected: false,
     nemesisTransactions: [],
     knownPeers: [],
@@ -91,6 +92,7 @@ export default {
     wsEndpoint: state => state.wsEndpoint,
     networkType: state => state.networkType,
     generationHash: state => state.generationHash,
+    properties: state => state.properties,
     defaultPeer: state => URLHelpers.formatUrl(networkConfig.defaultNode.url),
     currentPeer: state => state.currentPeer,
     currentPeerInfo: state => state.currentPeerInfo,
@@ -155,12 +157,10 @@ export default {
     setNemesisTransactions: (state, transactions) => Vue.set(state, 'nemesisTransactions', transactions),
     setSubscriptions: (state, data) => Vue.set(state, 'subscriptions', data),
     addSubscriptions: (state, payload) => {
-      if (payload && payload.length) {
-        const subscriptions = state.subscriptions
-        subscriptions.push(payload)
+      const subscriptions = state.subscriptions
+      subscriptions.push(payload)
 
-        Vue.set(state, 'subscriptions', subscriptions)
-      }
+      Vue.set(state, 'subscriptions', subscriptions)
     },
     generationHash: (state, hash) => Vue.set(state, 'generationHash', hash),
   },
@@ -270,6 +270,7 @@ export default {
         throw Error('Cannot change node. URL is not valid: ' + currentPeerUrl)
       }
 
+      dispatch('diagnostic/ADD_DEBUG', 'Store action network/SET_CURRENT_PEER dispatched with: ' + currentPeerUrl, {root: true})
       try {
         // - disconnect from previous node
         await dispatch('UNSUBSCRIBE')
@@ -285,7 +286,9 @@ export default {
           peerInfo: payload.peerInfo
         })
       }
-      catch (e) {}
+      catch (e) {
+        dispatch('diagnostic/ADD_ERROR', 'Error with store action network/SET_CURRENT_PEER: ' + JSON.stringify(e), {root: true})
+      }
     },
     ADD_KNOWN_PEER({commit}, peerUrl) {
       if (!URLHelpers.isValidURL(peerUrl)) {
@@ -332,15 +335,19 @@ export default {
     },
 
     // Unsubscribe from all open websocket connections
-    UNSUBSCRIBE({ dispatch, getters }) {
+    async UNSUBSCRIBE({ dispatch, getters }) {
       const subscriptions = getters.getSubscriptions
-      subscriptions.map((subscription: SubscriptionType) => {
-        // unsubscribe channels
-        subscription.subscriptions.map(sub => sub.unsubscribe())
 
-        // close listener
-        subscription.listener.close()
-      })
+      for (let i = 0, m = subscriptions.length; i < m; i++) {
+        const subscription = subscriptions[i]
+
+        // subscribers
+        for (let j = 0, n = subscription.subscriptions; j < n; j++) {
+          await subscription.subscriptions[j].unsubscribe()
+        }
+
+        await subscription.listener.close()
+      }
 
       // update state
       dispatch('RESET_SUBSCRIPTIONS')
@@ -370,8 +377,8 @@ export default {
         const blockHttp = RESTService.create('BlockHttp', currentPeer)
 
         // - fetch blocks information per-range (wait 3 seconds every 4th block)
-        ranges.slice(0, 3).map(({start}, index: number) => {
-          blockHttp.getBlocksByHeightWithLimit(start.toString(), 100).subscribe(
+        ranges.slice(0, 3).map(({start}) => {
+          blockHttp.getBlocksByHeightWithLimit(UInt64.fromUint(start), 100).subscribe(
             (infos: BlockInfo[]) => {
               infos.map(b => commit('addBlock', b))
               blocks = blocks.concat(infos)
@@ -391,14 +398,16 @@ export default {
         return false
       }
     },
-    async REST_FETCH_PEER_INFO({commit}, nodeUrl: string) {
+    async REST_FETCH_PEER_INFO({commit, dispatch}, nodeUrl: string) {
+      dispatch('diagnostic/ADD_DEBUG', 'Store action network/REST_FETCH_PEER_INFO dispatched with: ' + nodeUrl, {root: true})
+
       try {
         const blockHttp = RESTService.create('BlockHttp', nodeUrl)
         const chainHttp = RESTService.create('ChainHttp', nodeUrl)
         const nodeHttp = RESTService.create('NodeHttp', nodeUrl)
 
         // - read nemesis from REST
-        const nemesis = await blockHttp.getBlockByHeight('1').toPromise()
+        const nemesis = await blockHttp.getBlockByHeight(UInt64.fromUint(1)).toPromise()
 
         // - read peer info from REST
         const peerInfo = await nodeHttp.getNodeInfo().toPromise()

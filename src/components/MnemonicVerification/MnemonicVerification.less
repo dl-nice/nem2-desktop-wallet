@@ -26,11 +26,13 @@
     width: 100%;
     height: 238px;
     background: rgba(82,0,198,0.05);;
-    border: 1px solid #CCCCCC;
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 20px;
-    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    align-content: flex-start;
 
     span {
       font-size: 18px;
@@ -47,6 +49,10 @@
       opacity: 0.7;
     }
 
+    &::-webkit-scrollbar {
+      width: 7px;
+    }
+
   }
 
   .word-div {
@@ -61,5 +67,14 @@
       height: 40px;
       vertical-align: center;
     }
+  }
+  .button-container {
+    max-height: 100px;
+    width: 100%;
+    padding: 150px 0px;
+    display: flex;
+    float: right;
+    align-items: flex-end;
+    justify-content: flex-end;
   }
 }

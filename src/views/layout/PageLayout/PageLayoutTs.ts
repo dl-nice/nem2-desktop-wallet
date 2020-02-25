@@ -38,6 +38,8 @@ import PeerSelector from '@/components/PeerSelector/PeerSelector.vue'
 import LanguageSelector from '@/components/LanguageSelector/LanguageSelector.vue'
 // @ts-ignore
 import WalletSelectorField from '@/components/WalletSelectorField/WalletSelectorField.vue'
+// @ts-ignore
+import ModalDebugConsole from '@/views/modals/ModalDebugConsole/ModalDebugConsole.vue'
 
 @Component({
   components: {
@@ -48,12 +50,14 @@ import WalletSelectorField from '@/components/WalletSelectorField/WalletSelector
     PeerSelector,
     LanguageSelector,
     WalletSelectorField,
+    ModalDebugConsole,
   },
   computed: {
     ...mapGetters({
       currentPeer: 'network/currentPeer',
       isConnected: 'network/isConnected',
       networkType: 'network/networkType',
+      generationHash: 'network/generationHash',
       currentAccount: 'account/currentAccount',
     }),
   },
@@ -93,6 +97,15 @@ export class PageLayoutTs extends Vue {
    */
   public networkType: NetworkType
 
+  /**
+   * Current generationHash
+   * @see {Store.Network}
+   * @var {string}
+   */
+  public generationHash: string
+
+  public isDisplayingDebugConsole: boolean = false
+
 /// region computed properties getter/setter
   /**
    * Holds alert message
@@ -107,7 +120,19 @@ export class PageLayoutTs extends Vue {
       return {show: true, message: 'Wallet_network_type_does_not_match_current_network_type'}
     }
 
+    if (this.currentAccount && this.currentAccount.values.get('generationHash') !== this.generationHash) {
+      return {show: true, message: 'Wallet_network_type_does_not_match_current_network_type'}
+    }
+
     return {show: false, message: ''}
+  }
+
+  get hasDebugConsoleModal(): boolean {
+    return this.isDisplayingDebugConsole
+  }
+
+  set hasDebugConsoleModal(f: boolean) {
+    this.isDisplayingDebugConsole = f
   }
 /// end-region computed properties getter/setter
 
@@ -128,6 +153,6 @@ export class PageLayoutTs extends Vue {
       return ;
     }
 
-    await this.$store.dispatch('wallet/SET_CURRENT_WALLET', wallet)
+    await this.$store.dispatch('wallet/SET_CURRENT_WALLET', {model: wallet})
   }
 }

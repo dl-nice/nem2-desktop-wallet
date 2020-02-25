@@ -65,12 +65,6 @@ export class FormAccountSettingTs extends Vue {
   public generationHash: string
 
   /**
-   * Accounts repository
-   * @var {AccountsRepository}
-   */
-  public accountsRepository = new AccountsRepository()
-
-  /**
    * Validation rules
    * @var {ValidationRuleset}
    */
@@ -85,7 +79,6 @@ export class FormAccountSettingTs extends Vue {
     password: '',
     passwordAgain: '',
     hint: '',
-    networkType: NetworkType.TEST_NET,
   }
 
   ///**
@@ -132,13 +125,8 @@ export class FormAccountSettingTs extends Vue {
       [ 'seed', '' ],
       [ 'generationHash', this.generationHash ],
     ]))
-
-    // use repository for storage
-    this.accountsRepository.create(model.values)
-
-    // execute store actions
-    this.$store.dispatch('account/SET_CURRENT_ACCOUNT', model)
     this.$store.dispatch('temporary/SET_PASSWORD', this.formItems.password)
+    this.$store.dispatch('temporary/SET_ACCOUNT',model)
     this.$store.dispatch('notification/ADD_SUCCESS', NotificationType.OPERATION_SUCCESS)
 
     // flush and continue

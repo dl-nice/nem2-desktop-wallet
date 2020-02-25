@@ -38,7 +38,7 @@
                         v-focus
                         class="full-width-item-container input-size input-style"
                         :placeholder="$t('account_name')"
-                      >
+                      />
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -117,7 +117,7 @@
                       <input
                         v-model="formItems.hint"
                         class="full-width-item-container input-size input-style"
-                      >
+                      />
                     </div>
                   </ErrorTooltip>
                 </ValidationProvider>
@@ -149,20 +149,8 @@
 </template>
 
 <script lang="ts">
-import {FormAccountSettingTs} from './FormAccountSettingTs'
+import { FormAccountSettingTs } from "./FormAccountSettingTs";
+import './FormAccountSetting.less'
 export default class FormAccountSetting extends FormAccountSettingTs {}
 </script>
 
-<style lang="less" scoped>
-@import "../../../views/resources/css/variables.less";
-.form-account-setting{
-  .title{
-      font-size: 24px;
-      color: #999999;
-      margin-bottom: 18px;
-  }
-  .form-value{
-    margin-left: 100px;
-  }
-}
-</style>

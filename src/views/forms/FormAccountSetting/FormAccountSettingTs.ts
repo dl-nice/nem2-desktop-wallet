@@ -23,7 +23,6 @@ import { AccountsModel } from '@/core/database/entities/AccountsModel'
 import { NotificationType } from '@/core/utils/NotificationType'
 // internal dependencies
 import { ValidationRuleset } from '@/core/validation/ValidationRuleset'
-import { AccountsRepository } from '@/repositories/AccountsRepository'
 import { AccountService } from '@/services/AccountService'
 import { NetworkType, Password } from 'nem2-sdk'
 // child components
@@ -92,11 +91,11 @@ export class FormAccountSettingTs extends Vue {
   //  {value: NetworkType.MIJIN, label: 'MIJIN'},
   //]
 
-  /// region computed properties getter/setter
-  get nextPage() {
-    return this.$route.meta.nextPage
-  }
-  /// end-region computed properties getter/setter
+  ///// region computed properties getter/setter
+  //get nextPage() {
+  //  return this.$route.meta.nextPage
+  //}
+  ///// end-region computed properties getter/setter
 
   /**
    * Submit action, validates form and creates account in storage
@@ -120,6 +119,7 @@ export class FormAccountSettingTs extends Vue {
     const model = new AccountsModel(new Map<string, any>([
       [ 'accountName', this.formItems.accountName ],
       [ 'wallets', [] ],
+      [ 'networkType', '' ],
       [ 'password', passwordHash ],
       [ 'hint', this.formItems.hint ],
       [ 'seed', '' ],
@@ -128,8 +128,7 @@ export class FormAccountSettingTs extends Vue {
     this.$store.dispatch('temporary/SET_PASSWORD', this.formItems.password)
     this.$store.dispatch('temporary/SET_ACCOUNT',model)
     this.$store.dispatch('notification/ADD_SUCCESS', NotificationType.OPERATION_SUCCESS)
-
     // flush and continue
-    this.$router.push({name: this.nextPage})
+    this.$router.push({name: this.$route.meta.nextPage})
   }
 }

@@ -229,34 +229,39 @@ export default class GenerateWalletTs extends Vue {
   }
 
   public submit() {
-    if (!this.selectedWallets.length) {
-      return this.$store.dispatch(
-        'notification/ADD_ERROR',
-        NotificationType.INPUT_EMPTY_ERROR,
-      )
-    }
+    console.info(this.currentAccount);
+    //if (!this.selectedWallets.length) {
+    //  return this.$store.dispatch(
+    //    'notification/ADD_ERROR',
+    //    NotificationType.INPUT_EMPTY_ERROR,
+    //  )
+    //}
     try {
+
+      // set networkType
+      this.currentAccount.values.set('networkType', this.networkType)
+      console.info(this.currentAccount);
       // create wallet models
-      const wallets = this.createWalletsFromPathIndexes(this.selectedWallets)
+      //const wallets = this.createWalletsFromPathIndexes(this.selectedWallets)
       
-      // save newly created wallets
-      wallets.forEach((wallet, index) => {
-        // Store wallets using repository
-        this.walletsRepository.create(wallet.values)
-        // set current wallet
-        if (index === 0) this.$store.dispatch('wallet/SET_CURRENT_WALLET', {model: wallet})
-        // add wallets to account
-        this.$store.dispatch('account/ADD_WALLET', wallet)
-      })
+      //// save newly created wallets
+      //wallets.forEach((wallet, index) => {
+      //  // Store wallets using repository
+      //  this.walletsRepository.create(wallet.values)
+      //  // set current wallet
+      //  if (index === 0) this.$store.dispatch('wallet/SET_CURRENT_WALLET', {model: wallet})
+      //  // add wallets to account
+      //  this.$store.dispatch('account/ADD_WALLET', wallet)
+      //})
 
-      // get wallets identifiers
-      const walletIdentifiers = wallets.map(wallet => wallet.getIdentifier())
+      //// get wallets identifiers
+      //const walletIdentifiers = wallets.map(wallet => wallet.getIdentifier())
 
-      // set known wallets
-      this.$store.dispatch('wallet/SET_KNOWN_WALLETS', walletIdentifiers)
+      //// set known wallets
+      //this.$store.dispatch('wallet/SET_KNOWN_WALLETS', walletIdentifiers)
 
-      // add wallets to account
-      this.currentAccount.values.set('wallets', walletIdentifiers)
+      //// add wallets to account
+      //this.currentAccount.values.set('wallets', walletIdentifiers)
       // store account using repository
       this.accountsRepository.update(
         this.currentAccount.getIdentifier(),
@@ -301,10 +306,6 @@ export default class GenerateWalletTs extends Vue {
         [ 'path', paths[i] ],
         [ 'isMultisig', false ],
       ])))
-  }
-
-  public changeNetwork(){
-    console.info(this.networkType);
   }
    
 }

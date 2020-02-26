@@ -12,7 +12,7 @@
           <div class="title">
             {{ $t('Network_type') }}:
           </div>
-          <Select v-model="networkType">
+          <Select>
             <Option v-for="(item,index) in networkTypeList" :key="index" :value="item.value">
               {{ item.label }}
             </Option>
@@ -27,7 +27,7 @@
       <ButtonStep @click="$router.go(-1)">
         {{ $t('Previous_step') }}
       </ButtonStep>
-      <ButtonStep :primary="true" @click="$router.push({name: $route.meta.nextPage})">
+      <ButtonStep :primary="true" @click="submit">
         {{ $t('Next_step') }}
       </ButtonStep>
     </div>

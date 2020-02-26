@@ -167,7 +167,7 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.backupMnemonic',
                 meta: {
                   protected: false,
-                  title: '备份好助记词',
+                  title: 'bar_step_one_two',
                   extension: '2',
                   nextPage: 'accounts.creation.verifyMnemonic',
                 },
@@ -179,7 +179,7 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.verifyMnemonic',
                 meta: {
                   protected: false,
-                  title: '验证备份的助记词',
+                  title: 'bar_step_one_three',
                   extension: '3',
                   nextPage: 'accounts.creation.accountInfo',
                 },
@@ -191,7 +191,7 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.accountInfo',
                 meta: {
                   protected: false,
-                  title: '账户设置',
+                  title: 'bar_step_two',
                   extension: '4',
                   nextPage: 'accounts.creation.generateWallet',
                 },
@@ -203,7 +203,7 @@ export const routes: AppRoute[] = [
                 name: 'accounts.creation.generateWallet',
                 meta: {
                   protected: false,
-                  title: '导入钱包',
+                  title: 'bar_step_three',
                   extension: '5',
                   nextPage: 'dashboard',
                 },
@@ -224,7 +224,7 @@ export const routes: AppRoute[] = [
                 name: 'accounts.import.importMnemonic',
                 meta: {
                   protected: false,
-                  title: '输入助记词',
+                  title: 'bar_step_one',
                   extension: '1',
                   nextPage: 'accounts.import.accountInfo',
                 },
@@ -236,7 +236,7 @@ export const routes: AppRoute[] = [
                 name: 'accounts.import.accountInfo',
                 meta: {
                   protected: false,
-                  title: '账户设置',
+                  title: 'bar_step_two',
                   extension: '2',
                   nextPage: 'accounts.import.generateWallet',
                 },
@@ -248,7 +248,7 @@ export const routes: AppRoute[] = [
                 name: 'accounts.import.generateWallet',
                 meta: {
                   protected: false,
-                  title: '导入钱包',
+                  title: 'bar_step_three',
                   extension: '3',
                   nextPage: 'dashboard',
                 },

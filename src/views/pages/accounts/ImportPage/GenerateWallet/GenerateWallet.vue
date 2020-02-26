@@ -3,20 +3,20 @@
     <div class="import-wallet">
       <div class="select-network">
         <div class="title">
-          区块链网络:
+          {{ $t('chain_net') }}:
         </div>
         <input type="text" placeholder="symbol">
       </div>
       <div class="select-network">
         <div class="title">
-          网络类型:
+          {{ $t('Network_type') }}:
         </div>
         <Select name class>
           <Option>TEXT-NET</Option>
         </Select>
       </div>
     </div>
-    <TableTitle>选择钱包列表</TableTitle>
+    <TableTitle>{{ $t('select_wallet_list') }}</TableTitle>
     <div class="blank" />
     <SelectAccountTable />
   </div>

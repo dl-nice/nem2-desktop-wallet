@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Component, Prop, Vue} from 'vue-property-decorator'
 // @ts-ignore
 import confirmed from '@/views/resources/img/monitor/dash-board/dashboardConfirmed.png'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 
 @Component
 export class SelectAccountTableTs extends Vue {
+
+  @Prop({
+    default: () => []
+  }) walletList: {address: string, path: string,assets: string,choices: false}[]
+
+  
   columns1 = [
     {
       title: 'ADDRESS',
@@ -44,54 +50,4 @@ export class SelectAccountTableTs extends Vue {
     },
   ]
 
-  data1 = [
-    {
-      address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-      path: '0/0/../43/1/',
-      assets: '1000.00xym',
-      choices: confirmed,
-    },
-    {
-      address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-      path: '0/0/../43/1/',
-      assets: '1000.00xym',
-      choices: confirmed,
-    },
-    {
-      address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-      path: '0/0/../43/1/',
-      assets: '1000.00xym',
-      choices: confirmed,
-    },
-    {
-      address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-      path: '0/0/../43/1/',
-      assets: '1000.00xym',
-      choices: confirmed,
-    },
-    {
-      address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-      path: '0/0/../43/1/',
-      assets: '1000.00xym',
-      choices: confirmed,
-    },
-    {
-      address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-      path: '0/0/../43/1/',
-      assets: '1000.00xym',
-      choices: confirmed,
-    },
-    {
-      address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-      path: '0/0/../43/1/',
-      assets: '1000.00xym',
-      choices: confirmed,
-    },
-    {
-      address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-      path: '0/0/../43/1/',
-      assets: '1000.00xym',
-      choices: confirmed,
-    },
-  ]
 }

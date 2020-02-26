@@ -5,16 +5,16 @@
     </div>
     <div class="page-detail-container">
       <div v-if="$route.meta.title.length !== 0" class="page-content-title">
-        {{ $route.meta.title }}
+        {{ $t($route.meta.title) }}
       </div>
       <router-view />
     </div>
     <div class="button-container">
       <ButtonStep @click="$router.go(-1)">
-        上一步
+        {{ $t('Previous_step') }}
       </ButtonStep>
       <ButtonStep :primary="true" @click="$router.push({name: $route.meta.nextPage})">
-        下一步
+        {{ $t('Next_step') }}
       </ButtonStep>
     </div>
   </div>

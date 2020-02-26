@@ -5,7 +5,7 @@
     </div>
     <div class="page-detail-container">
       <div v-if="$route.meta.title && $route.meta.title.length !== 0" class="page-content-title">
-        {{ $route.meta.title }}
+        {{ $t($route.meta.title) }}
       </div>
       <router-view />
     </div>

@@ -17,8 +17,6 @@
 // @ts-ignore
 import ButtonStep from '@/components/ButtonStep/ButtonStep.vue'
 // @ts-ignore
-import ButtonStep from '@/components/ButtonStep/ButtonStep.vue'
-// @ts-ignore
 import MnemonicDisplay from '@/components/MnemonicDisplay/MnemonicDisplay.vue'
 // @ts-ignore
 import RightTipDisplay from '@/components/RightTipDisplay/RightTipDisplay.vue'

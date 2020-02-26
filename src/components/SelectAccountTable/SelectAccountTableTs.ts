@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// @ts-ignore
-import confirmed from '@/views/resources/img/monitor/dash-board/dashboardConfirmed.png'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 
@@ -49,5 +47,17 @@ export class SelectAccountTableTs extends Vue {
       // width: 80,
     },
   ]
+
+  selectedList: number[] = []
+
+  toggleSelect(row, index) {
+    this.walletList[index].choices = !this.walletList[index].choices
+    if (this.selectedList.includes(index)) {
+      this.selectedList.splice(this.selectedList.indexOf(index), 1)
+    } else {
+      this.selectedList.push(index)
+    }
+    this.$emit('click-row', this.selectedList)
+  }
 
 }

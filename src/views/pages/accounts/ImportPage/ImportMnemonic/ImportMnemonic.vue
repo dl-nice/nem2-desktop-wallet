@@ -1,13 +1,14 @@
 <template>
   <div class="import-mnemonic-page-wrapper">
     <div class="import-mnemonic-container">
-      <ImportMnemonic />
+      <ImportMnemonic @finish-data="updateMnemonic" />
     </div>
     <div class="right-tip-container">
       <RightTipDisplay 
         :tip-content="tipContents"
       />
     </div>
+    <button @click="submit">ok</button>
   </div>
 </template>
 

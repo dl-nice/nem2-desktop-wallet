@@ -123,7 +123,7 @@ export default class GenerateWalletTs extends Vue {
    * @see {Store.Network}
    * @var {NetworkType}
    */
-  public networkType: NetworkType
+  public networkType: NetworkType = NetworkType.TEST_NET
   
   /**
    * Network types
@@ -142,57 +142,6 @@ export default class GenerateWalletTs extends Vue {
    */
   public selectedWallets: number[] = []
 
-  // walletList = [
-  //  {
-  //    address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-  //    path: '0/0/../43/1/',
-  //    assets: '1000.00xym',
-  //    choices: false,
-  //  },
-  //  {
-  //    address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-  //    path: '0/0/../43/1/',
-  //    assets: '1000.00xym',
-  //    choices: false,
-  //  },
-  //  {
-  //    address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-  //    path: '0/0/../43/1/',
-  //    assets: '1000.00xym',
-  //    choices: false,
-  //  },
-  //  {
-  //    address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-  //    path: '0/0/../43/1/',
-  //    assets: '1000.00xym',
-  //    choices: false,
-  //  },
-  //  {
-  //    address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-  //    path: '0/0/../43/1/',
-  //    assets: '1000.00xym',
-  //    choices: false,
-  //  },
-  //  {
-  //    address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-  //    path: '0/0/../43/1/',
-  //    assets: '1000.00xym',
-  //    choices: false,
-  //  },
-  //  {
-  //    address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-  //    path: '0/0/../43/1/',
-  //    assets: '1000.00xym',
-  //    choices: false,
-  //  },
-  //  {
-  //    address: 'TASFDE-NUJVJE-6XYMOH-J7UX6N-NVZSF5-AF2Y7C-FEQP',
-  //    path: '0/0/../43/1/',
-  //    assets: '1000.00xym',
-  //    choices: false,
-  //  },
-  // ]
-
   get walletList() {
     const wallets = []
     this.addressesList.map((item, index) => {
@@ -202,10 +151,12 @@ export default class GenerateWalletTs extends Vue {
         path: `m/44'/43'/0'/0'/${index}'`,
         assets: '0',
         choices: false,
+        index,
       })
     })
     return wallets
   }
+  
   async mounted() {
     this.derivation = new DerivationService(this.$store)
     this.walletService = new WalletService(this.$store)
@@ -317,8 +268,8 @@ export default class GenerateWalletTs extends Vue {
       ])))
   }
 
-  public changeNetwork(){
-    console.info(this.networkType);
+  public updateSelectedList(selectedIndex) {
+    this.selectedWallets = selectedIndex
   }
    
 }

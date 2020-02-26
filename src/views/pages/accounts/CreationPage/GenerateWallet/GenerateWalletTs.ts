@@ -25,9 +25,11 @@ import { WalletsModel, WalletType } from '@/core/database/entities/WalletsModel'
 import { NotificationType } from '@/core/utils/NotificationType'
 import { AccountsRepository } from '@/repositories/AccountsRepository'
 import { WalletsRepository } from '@/repositories/WalletsRepository'
+import { AESEncryptionService } from '@/services/AESEncryptionService'
 import { DerivationPathLevels, DerivationService } from '@/services/DerivationService'
 import { MosaicService } from '@/services/MosaicService'
 import { WalletService } from '@/services/WalletService'
+import CryptoJS from 'crypto-js'
 import { MnemonicPassPhrase } from 'nem2-hd-wallets'
 import { Address, MosaicId, NetworkType, Password, SimpleWallet } from 'nem2-sdk'
 import { Component, Vue } from 'vue-property-decorator'
@@ -229,44 +231,50 @@ export default class GenerateWalletTs extends Vue {
   }
 
   public submit() {
-    console.info(this.currentAccount);
-    //if (!this.selectedWallets.length) {
-    //  return this.$store.dispatch(
-    //    'notification/ADD_ERROR',
-    //    NotificationType.INPUT_EMPTY_ERROR,
-    //  )
-    //}
+    if (!this.selectedWallets.length) {
+      return this.$store.dispatch(
+        'notification/ADD_ERROR',
+        NotificationType.INPUT_EMPTY_ERROR,
+      )
+    }
     try {
 
       // set networkType
       this.currentAccount.values.set('networkType', this.networkType)
-      console.info(this.currentAccount);
-      // create wallet models
-      //const wallets = this.createWalletsFromPathIndexes(this.selectedWallets)
-      
-      //// save newly created wallets
-      //wallets.forEach((wallet, index) => {
-      //  // Store wallets using repository
-      //  this.walletsRepository.create(wallet.values)
-      //  // set current wallet
-      //  if (index === 0) this.$store.dispatch('wallet/SET_CURRENT_WALLET', {model: wallet})
-      //  // add wallets to account
-      //  this.$store.dispatch('account/ADD_WALLET', wallet)
-      //})
-
-      //// get wallets identifiers
-      //const walletIdentifiers = wallets.map(wallet => wallet.getIdentifier())
-
-      //// set known wallets
-      //this.$store.dispatch('wallet/SET_KNOWN_WALLETS', walletIdentifiers)
-
-      //// add wallets to account
-      //this.currentAccount.values.set('wallets', walletIdentifiers)
-      // store account using repository
-      this.accountsRepository.update(
-        this.currentAccount.getIdentifier(),
-        this.currentAccount.values,
+      // set seed 
+      const entropy = CryptoJS.SHA256(this.currentMnemonic.plain).toString()
+      const seed = MnemonicPassPhrase.createFromEntropy(entropy)
+      // encrypt seed for storage
+      const encSeed = AESEncryptionService.encrypt(
+        seed.toSeed(this.currentPassword.value).toString('hex'),
+        this.currentPassword,
       )
+      // update currentAccount instance and storage
+      this.currentAccount.values.set('seed', encSeed)
+
+      // create wallet models
+      const wallets = this.createWalletsFromPathIndexes(this.selectedWallets)
+      
+      // save newly created wallets
+      wallets.forEach((wallet, index) => {
+        // Store wallets using repository
+        this.walletsRepository.create(wallet.values)
+        // set current wallet
+        if (index === 0) this.$store.dispatch('wallet/SET_CURRENT_WALLET', {model: wallet})
+        // add wallets to account
+        this.$store.dispatch('account/ADD_WALLET', wallet)
+      })
+
+      // get wallets identifiers
+      const walletIdentifiers = wallets.map(wallet => wallet.getIdentifier())
+
+      // set known wallets
+      this.$store.dispatch('wallet/SET_KNOWN_WALLETS', walletIdentifiers)
+
+      // add wallets to account
+      this.currentAccount.values.set('wallets', walletIdentifiers)
+      // store account using repository
+      this.accountsRepository.create(this.currentAccount.values)
 
       // execute store actions
       this.$store.dispatch('temporary/RESET_STATE')

@@ -18,7 +18,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator'
 @Component
 export class RightTipDisplayTs extends Vue {
   @Prop({
-    default: '温馨提示：',
+    default: 'Warm_tips',
   })
   tipTitle: string
 

@@ -51,6 +51,6 @@ export default class VerifyMnemonicTs extends Vue {
   /// end-region computed properties getter/setter
 
   tipContents: string[] = [
-    '助记词如果备份错误，将可能不能找回，请认真核对单词和顺序.',
+    'verify_mnemonic_tip_description_1',
   ]
 }

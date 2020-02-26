@@ -4,13 +4,13 @@
       <div class="import-wallet">
         <div class="select-network">
           <div class="title">
-            区块链网络:
+            {{ $t('chain_net') }}:
           </div>
           <input type="text" placeholder="symbol">
         </div>
         <div class="select-network">
           <div class="title">
-            网络类型:
+            {{ $t('Network_type') }}:
           </div>
           <Select v-model="networkType">
             <Option v-for="(item,index) in networkTypeList" :key="index" :value="item.value">
@@ -19,16 +19,16 @@
           </Select>
         </div>
       </div>
-      <TableTitle>选择钱包列表</TableTitle>
+      <TableTitle>{{ $t('select_wallet_list') }}</TableTitle>
       <div class="blank" />
       <SelectAccountTable :wallet-list="walletList"/>
     </div>
     <div class="button-container">
       <ButtonStep @click="$router.go(-1)">
-        上一步
+        {{ $t('Previous_step') }}
       </ButtonStep>
       <ButtonStep :primary="true" @click="$router.push({name: $route.meta.nextPage})">
-        下一步
+        {{ $t('Next_step') }}
       </ButtonStep>
     </div>
   </div>

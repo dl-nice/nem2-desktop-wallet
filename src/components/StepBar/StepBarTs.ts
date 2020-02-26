@@ -40,27 +40,27 @@ export class StepBarTs extends Vue {
   public defaultStepList = [
     {
       index: 1,
-      text: '创建助记词',
+      text: 'bar_step_one_one',
       isChild: false,
     },
     {
       index: 0,
-      text: '备份助记词',
+      text: 'bar_step_one_two',
       isChild: true,
     },
     {
       index: 0,
-      text: '验证备份',
+      text: 'bar_step_one_three',
       isChild: true,
     },
     {
       index: 2,
-      text: '设置账户',
+      text: 'bar_step_two',
       isChild: false,
     },
     {
       index: 3,
-      text: '导入钱包',
+      text: 'bar_step_three',
       isChild: false,
     },
   ]

@@ -192,6 +192,20 @@ export default class GenerateWalletTs extends Vue {
   //    choices: false,
   //  },
   // ]
+
+  get walletList() {
+    const wallets = []
+    this.addressesList.map((item, index) => {
+      wallets.push({
+        address: item.toDTO().address,
+        networkType: item.toDTO().networkType,
+        path: `m/44'/43'/0'/0'/${index}'`,
+        assets: '0',
+        choices: false,
+      })
+    })
+    return wallets
+  }
   async mounted() {
     this.derivation = new DerivationService(this.$store)
     this.walletService = new WalletService(this.$store)

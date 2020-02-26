@@ -4,7 +4,8 @@
     :data="walletList"
   >
     <template slot="choices" slot-scope="{ row }">
-      <img :src="row.choices" alt="">
+      <!-- <img :src="row.choices" alt=""> -->
+      <Icon :type="row.choices ? 'md-checkmark' : ''" />
     </template>
   </Table>
 </template>

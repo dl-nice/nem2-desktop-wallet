@@ -22,8 +22,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 export class SelectAccountTableTs extends Vue {
 
   @Prop({
-    default: () => []
-  }) walletList: {address: string, path: string,assets: string,choices: false}[]
+    default: () => [],
+  }) walletList: {address: string, path: string,assets: string,choices: boolean, index: number}[]
 
   
   columns1 = [

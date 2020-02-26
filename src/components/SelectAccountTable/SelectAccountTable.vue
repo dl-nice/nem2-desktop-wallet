@@ -1,7 +1,7 @@
 <template>
   <Table
     size="large" height="190" :columns="columns1"
-    :data="data1"
+    :data="walletList"
   >
     <template slot="choices" slot-scope="{ row }">
       <img :src="row.choices" alt="">

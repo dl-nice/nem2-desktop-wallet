@@ -12,7 +12,7 @@
           <div class="title">
             网络类型:
           </div>
-          <Select name class>
+          <Select v-model="networkType">
             <Option v-for="(item,index) in networkTypeList" :key="index" :value="item.value">
               {{ item.label }}
             </Option>
@@ -21,7 +21,7 @@
       </div>
       <TableTitle>选择钱包列表</TableTitle>
       <div class="blank" />
-      <SelectAccountTable />
+      <SelectAccountTable :wallet-list="walletList"/>
     </div>
     <div class="button-container">
       <ButtonStep @click="$router.go(-1)">

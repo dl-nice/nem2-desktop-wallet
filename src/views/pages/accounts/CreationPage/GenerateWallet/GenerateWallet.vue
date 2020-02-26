@@ -12,7 +12,7 @@
           <div class="title">
             网络类型:
           </div>
-          <Select name class>
+          <Select v-model="networkType">
             <Option v-for="(item,index) in networkTypeList" :key="index" :value="item.value">
               {{ item.label }}
             </Option>

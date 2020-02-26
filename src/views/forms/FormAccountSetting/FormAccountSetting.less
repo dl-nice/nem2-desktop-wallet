@@ -1,38 +1,51 @@
 @import "../../../views/resources/css/variables.less";
 
-.form-account-setting {
-    .title {
-        font-size: 24px;
-        color: #999999;
-        margin-bottom: 18px;
-    }
+.form-account-setting-wrapper {
+  // margin-right: 100px;
 
-    .value {
-        width: 7.6rem;
+  // .title {
+  //     font-size    : 24px;
+  //     color        : #999999;
+  //     margin-bottom: 18px;
+  // }
+  width: 100%;
+  .form-row-item {
+    color: #333333;
+    display        : flex;
+    align-items: center;
+    margin-bottom: 0.11rem;;
+
+    .form-label {
+      font-weight: 400;
+      min-width      : 2rem;
+      font-size: 0.2rem;
+      text-align: right;
+      padding-right: 0.15rem;
     }
 
     .form-value {
-        margin-left: 100px;
-    }
+      font-size: 0.2rem;
+      height: 0.42rem;
+      width          : 7.6rem;
+      display        : flex;
+      align-items: center;
 
-    .label {
-        font-weight: 400;
-        line-height: 27px;
-
-        .form-label-container .clearfix .form-label {
-            color: #333333;
-        }
-    }
-
-    .hash {
-        padding-top: 10px;
-    }
-
-    .full-width-item-container .input-size {
+      .input-size {
         width: 7.6rem;
-    }
+        height: 0.42rem;
+      }
 
-    .form-wrapper {
-        max-width: 9.6rem;
+      .inline-container {
+        height: 100%;
+
+        .ivu-tooltip {
+          height: 100%;
+
+          .ivu-tooltip-rel {
+            height: 100%;
+          }
+        }
+      }
     }
+  }
 }

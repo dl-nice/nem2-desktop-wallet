@@ -21,13 +21,13 @@
       </div>
       <TableTitle>{{ $t('select_wallet_list') }}</TableTitle>
       <div class="blank" />
-      <SelectAccountTable :wallet-list="walletList"/>
+      <SelectAccountTable :wallet-list="walletList" @click-row="updateSelectedList" />
     </div>
     <div class="button-container">
       <ButtonStep @click="$router.go(-1)">
         {{ $t('Previous_step') }}
       </ButtonStep>
-      <ButtonStep :primary="true" @click="$router.push({name: $route.meta.nextPage})">
+      <ButtonStep :primary="true" @click="submit">
         {{ $t('Next_step') }}
       </ButtonStep>
     </div>

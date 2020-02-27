@@ -16,21 +16,13 @@
         @click="addWord(word)"
       />
     </div>
-    <div class="button-container">
-      <button
-        type="button"
-        class="button-style back-button" 
-        @click="$emit('cancelled')"
-      >
+    <div class="verify-mnemonic-button-container">
+      <ButtonStep @click="$emit('cancelled')">
         {{ $t('previous') }}
-      </button>
-      <button
-        type="submit"
-        class="button-style validation-button" 
-        @click="processVerification()"
-      >
+      </ButtonStep>
+      <ButtonStep :primary="true" @click="processVerification()">
         {{ $t('next') }}
-      </button> 
+      </ButtonStep> 
     </div>
   </div>
 </template>

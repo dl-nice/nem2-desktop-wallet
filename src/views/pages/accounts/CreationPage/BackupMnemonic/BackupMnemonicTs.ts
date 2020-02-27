@@ -22,6 +22,8 @@ import ButtonStep from '@/components/ButtonStep/ButtonStep.vue'
 import MnemonicDisplay from '@/components/MnemonicDisplay/MnemonicDisplay.vue'
 // @ts-ignore
 import RightTipDisplay from '@/components/RightTipDisplay/RightTipDisplay.vue'
+// @ts-ignore
+import MnemonicDisplay from '@/components/MnemonicDisplay/MnemonicDisplay.vue'
 import { MnemonicPassPhrase } from 'nem2-hd-wallets'
 import { Component, Vue } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'

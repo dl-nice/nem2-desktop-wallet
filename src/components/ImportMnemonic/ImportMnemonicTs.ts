@@ -9,5 +9,9 @@ export default class ImportMnemonicTs extends Vue {
 
   hashCode: string = 'NaN...'
 
-  mnemonicContent: string
+  mnemonicContent: string = ''
+
+  submitData() {
+    this.$emit('finish-data', {content: this.mnemonicContent, type: this.mnemonicType})
+  }
 }

@@ -198,7 +198,6 @@ export default class GenerateWalletTs extends Vue {
   }
 
   public submit() {
-    console.info(this.selectedWallets)
     if (!this.selectedWallets.length) {
       return this.$store.dispatch(
         'notification/ADD_ERROR',

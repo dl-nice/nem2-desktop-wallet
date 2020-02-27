@@ -173,8 +173,9 @@ export default class GenerateWalletTs extends Vue {
    * @return {void}
    */
   private async initAccounts() {
+    console.info(this.networkType,'this.networkType')
     // - generate addresses
-    this.generaterAddress( NetworkType.TEST_NET,10)
+    this.generaterAddress(this.networkType,10)
     // fetch accounts info
     const accountsInfo = await this.$store.dispatch('wallet/REST_FETCH_INFOS',this.addressesList)
     if (!accountsInfo) return
@@ -191,9 +192,11 @@ export default class GenerateWalletTs extends Vue {
       WalletService.DEFAULT_WALLET_PATH,
       addressNum,
     )
+    console.info(this.addressesList,"this.addressesList")
   }
 
   public submit() {
+    console.info(this.selectedWallets);
     if (!this.selectedWallets.length) {
       return this.$store.dispatch(
         'notification/ADD_ERROR',
@@ -203,7 +206,7 @@ export default class GenerateWalletTs extends Vue {
     try {
       // create wallet models
       const wallets = this.createWalletsFromPathIndexes(this.selectedWallets)
-      
+      console.info(wallets,'wallets')
       // save newly created wallets
       wallets.forEach((wallet, index) => {
         // Store wallets using repository

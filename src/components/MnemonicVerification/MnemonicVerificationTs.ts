@@ -19,6 +19,8 @@ import MnemonicTag from '@/components/MnemonicTag/MnemonicTag.vue'
 import { NotificationType } from '@/core/utils/NotificationType'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import draggable from 'vuedraggable'
+// @ts-ignore
+import ButtonStep from '@/components/ButtonStep/ButtonStep.vue'
 
 
 /// region helpers
@@ -42,6 +44,7 @@ const shuffle = (a) => {
   components:{
     draggable,
     MnemonicTag,
+    ButtonStep,
   },
 })
 export class MnemonicVerificationTs extends Vue {

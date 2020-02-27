@@ -106,19 +106,13 @@
             </ValidationProvider>
           </div>
         </div>
-        <div class="form-line-container form-row-item">
-          <div class="flex-container mt-3">
-            <button type="button" class="button-style back-button" @click="$router.back()">
-              上一步
-            </button>
-            <button
-              type="button"
-              class="button-style validation-button"
-              @click="handleSubmit(submit)"
-            >
-              下一步
-            </button>
-          </div>
+        <div class="form-button-container">
+          <ButtonStep @click="$router.back()">
+            上一步
+          </ButtonStep>
+          <ButtonStep :primary="true" @click="handleSubmit(submit)">
+            下一步
+          </ButtonStep>
         </div>
       </form>
     </ValidationObserver>

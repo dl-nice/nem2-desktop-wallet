@@ -29,6 +29,8 @@ import { NetworkType, Password } from 'nem2-sdk'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import { Component, Vue } from 'vue-property-decorator'
 import { mapGetters } from 'vuex'
+// @ts-ignore
+import ButtonStep from '@/components/ButtonStep/ButtonStep.vue'
 
 
 /// region custom types
@@ -42,6 +44,7 @@ type NetworkNodeEntry = {value: NetworkType, label: string}
     ErrorTooltip,
     FormWrapper,
     FormLabel,
+    ButtonStep,
   },
   computed: {...mapGetters({
     generationHash: 'network/generationHash',
